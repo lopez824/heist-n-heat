@@ -1,6 +1,6 @@
 {
-  "name": "heist-n-heat",
-  "version": "1.0",
+  "name": "phaser3-project-template",
+  "version": "1.1.2",
   "description": "Uses Phaser 3 Project Template",
   "main": "src/index.js",
   "scripts": {
@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lopez824/heist-n-heat.git"
+    "url": "git+https://github.com/photonstorm/phaser3-project-template.git"
   },
   "author": "Lionel Lopez <lionelslopez14@gmail.com>",
   "license": "",
   "licenseUrl": "",
   "bugs": {
-    "url": "https://github.com/lopez824/heist-n-heat/issues"
+    "url": "https://github.com/photonstorm/phaser3-project-template"
   },
-  "homepage": "https://github.com/lopez824/heist-n-heat#readme",
+  "homepage": "https://github.com/photonstorm/phaser3-project-template#readme",
   "devDependencies": {
     "@babel/core": "^7.7.2",
     "@babel/preset-env": "^7.7.1",
@@ -33,6 +33,6 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "phaser": "3.55.2"
+    "phaser": "^3.50.0"
   }
 }

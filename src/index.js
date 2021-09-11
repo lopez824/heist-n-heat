@@ -30,10 +30,11 @@ class MyGame extends Phaser.Scene
 
 const config = {
     type: Phaser.AUTO,
-    parent: 'phaser-example',
+    parent: 'gameContainer',
     width: 800,
     height: 600,
-    scene: MyGame
+    scene: MyGame,
+    canvas: document.querySelector('canvas')
 };
 
 const game = new Phaser.Game(config);

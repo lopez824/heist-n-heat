@@ -1,0 +1,11 @@
+canvas {
+    display: block;
+    text-align: center;
+}
+div {
+    display: block;
+}
+p {
+    text-align: center;
+    text-transform: uppercase;
+}
