@@ -31,6 +31,9 @@ module.exports = {
       {
         test: /\.(gif|png|jpe?g|svg|xml|mp3|wav|ogg|acc|flac)$/i,
         use: 'file-loader',
+        options: {
+          name: '[path][name].[ext]'
+        }
       },
     ],
   },
@@ -45,5 +48,5 @@ module.exports = {
   ],
   output: {
     publicPath: '/'
-  }
+  },
 };

@@ -1,9 +1,10 @@
-canvas {
-    display: block;
-    text-align: center;
+#background {
+    background-image: url("./assets/logo.png");
 }
-div {
-    display: block;
+#gameContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 p {
     text-align: center;
