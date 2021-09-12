@@ -1,13 +1,13 @@
 #background {
     background-color: rgb(53, 54, 58);
 }
+#titleText {
+    color: whitesmoke;
+    text-align: center;
+    text-transform: uppercase;
+}
 #gameContainer {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-p {
-    color: whitesmoke;
-    text-align: center;
-    text-transform: uppercase;
 }
