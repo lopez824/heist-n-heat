@@ -9,14 +9,14 @@ class MyGame extends Phaser.Scene {
   }
 
   preload() {
-    //this.load.image("logo", logoImg);
-    this.load.image("map", mapImg);
+    this.load.image("logo", logoImg);
+    //this.load.image("map", mapImg);
   }
 
   create() {
-    this.add.image(800, 600, "map");
+    //this.add.image(800, 600, "map");
 
-    /* const logo = this.add.image(400, 150, "logo");
+    const logo = this.add.image(400, 150, "logo");
 
     this.tweens.add({
       targets: logo,
@@ -25,7 +25,7 @@ class MyGame extends Phaser.Scene {
       ease: "Power2",
       yoyo: true,
       loop: -1,
-    }); */
+    }); 
   }
 }
 
