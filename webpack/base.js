@@ -43,7 +43,12 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './index.html',
     }),
-    new FaviconsWebpackPlugin('./src/assets/favicon.png'),
+    new FaviconsWebpackPlugin(
+      {
+        logo: './src/assets/favicon.png',
+        prefix: 'assets/'
+      }
+    ),
   ],
   output: {
     publicPath: '/'
