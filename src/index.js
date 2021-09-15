@@ -6,6 +6,8 @@ import "./index.css"
 
 var player;
 var cursors;
+var keyA;
+var keyD;
 var text;
 var score;
 var debugText;
@@ -44,6 +46,8 @@ class MyGame extends Phaser.Scene {
     player.setFixedRotation();
     
     cursors = this.input.keyboard.createCursorKeys();
+    keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+    keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     debugText = this.add.text(10,20,'', {font: '16px Courier', fill: '#ffffff'});
     text = this.add.text(10,0,'', {font: '16px Courier', fill: '#ffffff'});
 
@@ -73,14 +77,14 @@ class MyGame extends Phaser.Scene {
       //player.setDrag(0.25);
     }
 
-    if (cursors.left.isDown)
+    if (cursors.left.isDown || keyA.isDown)
     {
       player.angle -= 2.5;
       //player.thrust(0.005);
       //player.setVelocityY(100);
       //this.time.addEvent({ delay: 100, callback: () => player.setDrag(.01)});
     }
-    else if (cursors.right.isDown)
+    else if (cursors.right.isDown || keyD.isDown)
     {
       player.angle += 2.5;
       //player.thrust(0.005);
