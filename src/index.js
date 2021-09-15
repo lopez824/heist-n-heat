@@ -70,7 +70,7 @@ class MyGame extends Phaser.Scene {
       targets: graphics,
       scaleX: .01,
       ease: 'Linear',
-      duration: 10000
+      duration: 30000
     });
     this.matter.world.setBounds(0, 0, 2150, 2525);
   }
