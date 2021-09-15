@@ -23,6 +23,7 @@ class MyGame extends Phaser.Scene {
   }
 
   create() {
+    this.cameras.main.setBounds(0, 0, 2150, 2525);
     const map = this.add.image(850, 1000,"map");
     map.scale = map.scale*3;
 
@@ -55,10 +56,11 @@ class MyGame extends Phaser.Scene {
         }
     });
 
-    this.matter.world.setBounds(0, 0, 800, 640);
+    this.matter.world.setBounds(0, 0, 2150, 2525);
   }
 
   update() {
+    this.cameras.main.centerOn(player.x,player.y);
     player.thrust(0.03);
     
     if (cursors.up.isDown) {
