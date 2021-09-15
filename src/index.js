@@ -10,6 +10,7 @@ var keyA;
 var keyD;
 var text;
 var score;
+var fuel
 var debugText;
 
 class MyGame extends Phaser.Scene {
@@ -25,6 +26,7 @@ class MyGame extends Phaser.Scene {
   }
 
   create() {
+    
     this.cameras.main.setBounds(0, 0, 2150, 2525);
     const map = this.add.image(850, 1000,"map");
     map.scale = map.scale*3;
@@ -49,7 +51,11 @@ class MyGame extends Phaser.Scene {
     keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
     keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     debugText = this.add.text(10,20,'', {font: '16px Courier', fill: '#ffffff'});
-    text = this.add.text(10,0,'', {font: '16px Courier', fill: '#ffffff'});
+    text = this.add.text(10,0,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
+
+    var fuel = new Phaser.Geom.Rectangle(0, 30, 150, 25);
+    var graphics = this.add.graphics({ fillStyle: { color: 0x00ff00 } }).setScrollFactor(0);
+    graphics.fillRectShape(fuel);
 
     score = 0;
 
@@ -60,6 +66,12 @@ class MyGame extends Phaser.Scene {
         }
     });
 
+    this.tweens.add({
+      targets: graphics,
+      scaleX: .01,
+      ease: 'Linear',
+      duration: 10000
+    });
     this.matter.world.setBounds(0, 0, 2150, 2525);
   }
 
