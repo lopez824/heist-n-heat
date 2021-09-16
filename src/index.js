@@ -1,10 +1,15 @@
 import Phaser from "phaser";
-import mapImg from "./assets/mapExample.png";
+import mapJSON from "./assets/map.json";
+import tileImg from "./assets/TileSet.png"
 import playerImg from "./assets/Car_Placeholder.png";
+import copBWImg from "./assets/CopBW.png";
+import DftImg from './assets/drift_trail.png';
 import cashImg from './assets/Cash.png';
-import "./index.css"
+import "./index.css";
 
 var player;
+var Dtrail;
+var copBW;
 var cursors;
 var keyA;
 var keyD;
@@ -20,17 +25,22 @@ class MyGame extends Phaser.Scene {
   }
   
   preload() {
-    this.load.image("map", mapImg);
     this.load.image("player", playerImg);
+    this.load.image("dft", DftImg);
+    this.load.image("copBW", copBWImg);
     this.load.image("cash", cashImg);
+    this.load.image("tiles", tileImg);
+    this.load.tilemapTiledJSON('map', mapJSON);
   }
 
   create() {
     
     // initialize map
-    this.cameras.main.setBounds(0, 0, 2150, 2525);
-    const map = this.add.image(850, 1000,"map");
-    map.scale = map.scale*3;
+    var map = this.make.tilemap({key:'map'});
+    const tileset = map.addTilesetImage('TileSet','tiles');
+    map.createLayer('Tile Layer 1', tileset,0,0); 
+    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+    
     const cash1 = this.matter.add.sprite(230, 210,'cash').setStatic(true).setSensor(true);
     const cash2 = this.matter.add.sprite(552, 175,'cash').setStatic(true).setSensor(true);
     const cash3 = this.matter.add.sprite(430, 450,'cash').setStatic(true).setSensor(true);
@@ -43,11 +53,23 @@ class MyGame extends Phaser.Scene {
       height: 50
     });
 
+    copBW = this.matter.add.sprite(200,320, "copBW");
+    copBW.setBody({    
+      type: 'rectangle',
+      width: 22,
+      height: 32
+    });
+
     // matterJS properties
     player.setScale(0.5);
     player.setMass(30);
     player.setFrictionAir(0.1);
     player.setFixedRotation();
+    
+    copBW.setScale(1.25);
+    copBW.setMass(30);
+    copBW.setFrictionAir(0.1);
+    copBW.setFixedRotation();
     
     // initialize User Interface
     text = this.add.text(10,0,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
@@ -78,20 +100,26 @@ class MyGame extends Phaser.Scene {
       duration: 30000
     });
 
-    this.matter.world.setBounds(0, 0, 2150, 2525);  // sets game world bounds
+    this.matter.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
   }
 
   update() {
     this.cameras.main.centerOn(player.x,player.y);
-    player.thrust(0.06);
+    
+    player.thrust(0.04);
 
+    if (cursors.up.isDown) {
+      this.cameras.main.zoom -= .01;
+    }
     if (cursors.left.isDown || keyA.isDown)
     {
-      player.angle -= 5;
+      player.angle -= 4;
+      Dtrail = this.add.sprite(player.x, player.y, "dft");
     }
     else if (cursors.right.isDown || keyD.isDown)
     {
-      player.angle += 5;
+      player.angle += 4;
+      Dtrail = this.add.sprite(player.x, player.y, "dft");
     }
 
     text.setText('Score: $' + score);
