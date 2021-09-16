@@ -2,9 +2,12 @@ import Phaser from "phaser";
 import mapImg from "./assets/mapExample.png";
 import playerImg from "./assets/Car_Placeholder.png";
 import cashImg from './assets/Cash.png';
+
+import DftImg from './assets/drift trail.png';
 import "./index.css"
 
 var player;
+var Dtrail;
 var cursors;
 var text;
 var score;
@@ -19,7 +22,8 @@ class MyGame extends Phaser.Scene {
   preload() {
     this.load.image("map", mapImg);
     this.load.image("player", playerImg);
-    this.load.image("cash", cashImg);
+      this.load.image("cash", cashImg);
+      this.load.image("dft", DftImg);
   }
 
   create() {
@@ -73,17 +77,29 @@ class MyGame extends Phaser.Scene {
 
     if (cursors.left.isDown)
     {
+<<<<<<< Updated upstream
       player.angle -= 2.5;
       //player.thrust(0.005);
       //player.setVelocityY(100);
       //this.time.addEvent({ delay: 100, callback: () => player.setDrag(.01)});
+=======
+        player.angle -= 5;
+
+        Dtrail = this.add.sprite(player.x , player.y, "dft");
+>>>>>>> Stashed changes
     }
     else if (cursors.right.isDown)
     {
+<<<<<<< Updated upstream
       player.angle += 2.5;
       //player.thrust(0.005);
       //player.setVelocityY(100);
       //this.time.addEvent({ delay: 100, callback: () => player.setDrag(.01)});
+=======
+        player.angle += 5;
+
+        Dtrail = this.add.sprite(player.x, player.y, "dft");
+>>>>>>> Stashed changes
     }
 
     text.setText('Score: $' + score);
