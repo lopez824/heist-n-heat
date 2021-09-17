@@ -1,6 +1,6 @@
 import Phaser from "phaser";
-import mapJSON from "./assets/map.json";
-import tileImg from "./assets/TileSet.png"
+import mapJSON from "./assets/Map.json";
+import tileImg from "./assets/Tilesheet.png"
 import playerImg from "./assets/Car_Placeholder.png";
 import copBWImg from "./assets/copBW.png";
 import DftImg from './assets/drift_trail.png';
@@ -39,8 +39,9 @@ class MyGame extends Phaser.Scene {
 
     // initialize map
     var map = this.make.tilemap({key:'map'});
-    const tileset = map.addTilesetImage('TileSet','tiles');
+    const tileset = map.addTilesetImage('Tilesheet','tiles');
     map.createLayer('Tile Layer 1', tileset,0,0); 
+    map.createLayer('Tile Layer 2', tileset,0,0); 
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     
     // create collectibles
