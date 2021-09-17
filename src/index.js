@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import mapJSON from "./assets/Map.json";
+import mapJSON from "./assets/map.json";
 import tileImg from "./assets/Tilesheet.png"
 import playerImg from "./assets/Car_Placeholder.png";
 import copBWImg from "./assets/copBW.png";
