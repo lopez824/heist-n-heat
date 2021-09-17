@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import mapJSON from "./assets/map.json";
 import tileImg from "./assets/TileSet.png"
 import playerImg from "./assets/Car_Placeholder.png";
-import copBWImg from "./assets/CopBW.png";
+import copBWImg from "./assets/copBW.png";
 import DftImg from './assets/drift_trail.png';
 import cashImg from './assets/Cash.png';
 import Player from "./Player.js"
