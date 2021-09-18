@@ -38,13 +38,13 @@ class MyGame extends Phaser.Scene {
     this.load.image("player", playerImg);
     this.load.image("dft", DftImg);
     this.load.image('speed', SpeedImg);
-      this.load.spritesheet('SpeedD', SpeedImg, { frameWidth: 128, frameHeight: 128 });
-      this.load.spritesheet('CarAni', CarAImg, { frameWidth: 128, frameHeight: 128 });
+    this.load.spritesheet('SpeedD', SpeedImg, { frameWidth: 128, frameHeight: 128 });
+    this.load.spritesheet('CarAni', CarAImg, { frameWidth: 128, frameHeight: 128 });
     this.load.image("copBW", copBWImg);
-      this.load.image("cash", cashImg);
-      this.load.image("dash", dashImg);
+    this.load.image("cash", cashImg);
+    this.load.image("dash", dashImg);
     this.load.image("tiles", tileImg);
-      this.load.tilemapTiledJSON('map', mapJSON);
+    this.load.tilemapTiledJSON('map', mapJSON);
 
   }
 
@@ -85,21 +85,18 @@ class MyGame extends Phaser.Scene {
         frameRate: 20
 
     });
+    this.anims.create({
+      key: "right",
+      frames: this.anims.generateFrameNumbers('CarAni', { frames: [5,6,7] }),
+      frameRate: 20
 
+    });
+    this.anims.create({
+      key: "left",
+      frames: this.anims.generateFrameNumbers('CarAni', { frames: [8,9,10] }),
+      frameRate: 20
+    });
 
-      this.anims.create({
-          key: "right",
-          frames: this.anims.generateFrameNumbers('CarAni', { frames: [5,6,7] }),
-          frameRate: 20
-
-      });
-
-      this.anims.create({
-          key: "left",
-          frames: this.anims.generateFrameNumbers('CarAni', { frames: [8,9,10] }),
-          frameRate: 20
-
-      });
     //create player
     player = new Player(this, 400, 420);
 
@@ -116,7 +113,8 @@ class MyGame extends Phaser.Scene {
     scoreText = this.add.text(200,580,'', {font: '30px Courier', fill: '#ffffff'}).setScrollFactor(0);
     score = 0;
     var graphics = new Phaser.Geom.Rectangle(270, 510, 150, 20);
-    var fuel = this.add.graphics({ fillStyle: { color: 0x00ff00 } }).setScrollFactor(0);
+    var fuel = this.add.graphics().setScrollFactor(0);
+    fuel.fillGradientStyle(0xFFFF00, 0x00FF00, 1);
     fuel.fillRectShape(graphics);
 
     // create speedomemter
@@ -165,12 +163,12 @@ class MyGame extends Phaser.Scene {
 
     debugText = this.add.text(10,60,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
     debugText2 = this.add.text(10,80,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
+    
     this.matter.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);   // world bounds
   }
 
   update() {
     this.cameras.main.centerOn(player.x,player.y);
-    
     player.update();
     copBW.update(player);
 
@@ -217,25 +215,23 @@ class MyGame extends Phaser.Scene {
     if (player.body.speed < 2.7)
     {
       speedAnim.setFrame(2);
-      }
+    }
 
-      if (player.body.speed > 3.4 && player.body.speed < 3.8 && !arrowKeys.right.isDown && !Dkey.isDown) {
-          player.play('fast');
-      }
+    if (player.body.speed > 3.4 && player.body.speed < 3.8 && !arrowKeys.right.isDown && !Dkey.isDown) {
+        player.play('fast');
+    }
 
-      if (player.body.speed <= 3.4 && !arrowKeys.left.isDown && !Akey.isDown &&  !arrowKeys.right.isDown && !Dkey.isDown) {
-          player.play('slow');
-      }
+    if (player.body.speed <= 3.4 && !arrowKeys.left.isDown && !Akey.isDown &&  !arrowKeys.right.isDown && !Dkey.isDown) {
+        player.play('slow');
+    }
 
-      if ( arrowKeys.left.isDown || Akey.isDown) {
-          player.play('left');
-      }
+    if ( arrowKeys.left.isDown || Akey.isDown) {
+        player.play('left');
+    }
 
-      if (arrowKeys.right.isDown || Dkey.isDown) {
-          player.play('right');
-      }
-
-
+    if (arrowKeys.right.isDown || Dkey.isDown) {
+        player.play('right');
+    }
 
     var pointer = this.input.activePointer;
     debugText2.setText([

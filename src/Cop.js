@@ -1,5 +1,5 @@
 var inPursuit;
-var speed;
+var direction;
 
 export default class Cop extends Phaser.Physics.Matter.Sprite {
     constructor(scene, x, y, texture) {
@@ -10,7 +10,7 @@ export default class Cop extends Phaser.Physics.Matter.Sprite {
     // sets MatterJS properties
     initialize() {
         inPursuit = true;
-        speed = 1;
+        direction = "Up";
         this.setBody({    
             type: 'rectangle',
             width: 32,
@@ -25,9 +25,25 @@ export default class Cop extends Phaser.Physics.Matter.Sprite {
 
     update(player) {
         this.thrust(0.042);
-        if (inPursuit) {
-            const direction = Math.atan2((player.y - this.y), (player.x - this.x));
-            this.angle = direction*(180/Math.PI);
+        if (this.angle >= -20 && this.angle <= 20) {
+            direction = "Right";
         }
+        else if (this.angle >= 70 && this.angle <= 110) {
+            direction = "Down";
+        }
+        else if (this.angle >= 160 || this.angle <= -160) {
+            direction = "Left";
+        }
+        else if (this.angle >= -110 && this.angle <= -70) {
+            direction = "Up";
+        }
+        if (inPursuit) {
+            const theta = Math.atan2((player.y - this.y), (player.x - this.x));
+            this.angle = theta*(180/Math.PI);
+        }
+    }
+
+    getDirection() {
+        return direction;
     }
 }
