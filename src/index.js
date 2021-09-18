@@ -61,22 +61,27 @@ class MyGame extends Phaser.Scene {
     
     // create collectibles
     const cash1 = this.matter.add.sprite(230, 210,'cash').setStatic(true).setSensor(true);
+    cash1.body.label = 'cash';
     const cash2 = this.matter.add.sprite(552, 175,'cash').setStatic(true).setSensor(true);
+    cash2.body.label = 'cash';
     const cash3 = this.matter.add.sprite(430, 450,'cash').setStatic(true).setSensor(true);
+    cash3.body.label = 'cash';
 
     //create player
     player = new Player(this,400,420,"player");
     player.initialize();
+    player.body.label = "player";
 
     // create cop
     copBW = new Cop(this, 200,420,"copBW");
     copBW.initialize();
+    copBW.body.label = "cop";
     
     // create user interface
     dash = this.add.sprite(400, 340, 'dash').setScrollFactor(0);
     scoreText = this.add.text(10,0,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
     score = 0;
-      var graphics = new Phaser.Geom.Rectangle(270, 510, 150, 20);
+    var graphics = new Phaser.Geom.Rectangle(270, 510, 150, 20);
     var fuel = this.add.graphics({ fillStyle: { color: 0x00ff00 } }).setScrollFactor(0);
     fuel.fillRectShape(graphics);
 
@@ -90,6 +95,15 @@ class MyGame extends Phaser.Scene {
     speedAnim.setScale(1);
     speedAnim.play('start');
 
+    // tween animations
+    this.tweens.add({
+      targets: fuel,
+      scaleX: 0,
+      x: 270,
+      ease: 'Linear',
+      duration: 30000
+    });
+
     // set up inputs
     arrowKeys = this.input.keyboard.createCursorKeys();
     Akey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
@@ -97,18 +111,22 @@ class MyGame extends Phaser.Scene {
 
     // collision listeners
     this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
-        if (bodyA.gameObject.name == "cash" && bodyB.gameObject.name == "player") {
+      if (bodyA.label == "Rectangle Body") {
+        if (bodyA.gameObject != null) {
+          if (bodyA.gameObject.tile.properties.name == "sign") {
+            debugText.setText("Hit: " + bodyA.gameObject.tile.properties.name);
+          }
+        }
+      }
+      else {
+        if (bodyA.label == "cash" && bodyB.label == "player") {
           score += 100;
           bodyA.gameObject.destroy();
         }
-    });
-
-    // tween animations
-    this.tweens.add({
-      targets: fuel,
-      scaleX: .01,
-      ease: 'Linear',
-      duration: 30000
+        if (bodyA.label == "player" && bodyB.label == "cop") {
+          debugText.setText("Hit: " + bodyA.label);
+        }
+      }
     });
 
     debugText = this.add.text(10,60,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
@@ -118,10 +136,9 @@ class MyGame extends Phaser.Scene {
 
   update() {
     this.cameras.main.centerOn(player.x,player.y);
-    debugText.setText(typeof speedAnim);
     
     player.update();
-    copBW.update();
+    copBW.update(player);
 
     if (arrowKeys.left.isDown || Akey.isDown)
     {

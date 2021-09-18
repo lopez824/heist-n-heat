@@ -81,7 +81,13 @@
                      "visible":true,
                      "x":0,
                      "y":0
-                    }
+                    },
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"sign"
+                        }]
                 }],
          "tilewidth":32
         }],
