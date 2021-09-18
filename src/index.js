@@ -10,10 +10,12 @@ import Player from "./Player.js"
 import Cop from './Cop.js';
 import "./index.css";
 import dashImg from "./assets/dash.png";
+import CarAImg from "./assets/Car_ani.png"
 
 var player;
 var Dtrail;
 var speedAnim;
+var CarAnim;
 var copBW;
 var arrowKeys;
 var Akey;
@@ -23,6 +25,7 @@ var score;
 var debugText;
 var debugText2;
 var dash;
+var key4CarAnim;
 
 // Represents Game Scene
 class MyGame extends Phaser.Scene {
@@ -35,7 +38,8 @@ class MyGame extends Phaser.Scene {
     this.load.image("player", playerImg);
     this.load.image("dft", DftImg);
     this.load.image('speed', SpeedImg);
-    this.load.spritesheet('SpeedD', SpeedImg, {frameWidth: 128, frameHeight: 128});
+      this.load.spritesheet('SpeedD', SpeedImg, { frameWidth: 128, frameHeight: 128 });
+      this.load.spritesheet('CarAni', CarAImg, { frameWidth: 128, frameHeight: 128 });
     this.load.image("copBW", copBWImg);
       this.load.image("cash", cashImg);
       this.load.image("dash", dashImg);
@@ -67,8 +71,38 @@ class MyGame extends Phaser.Scene {
     const cash3 = this.matter.add.sprite(430, 450,'cash').setStatic(true).setSensor(true);
     cash3.body.label = 'cash';
 
+    // car animations
+    this.anims.create({
+        key: "fast",
+        frames: this.anims.generateFrameNumbers('CarAni', { frames: [1, 2, 3] }),
+        frameRate: 1,
+        repeat: 20
+
+    });
+    this.anims.create({
+        key: "slow",
+        frames: this.anims.generateFrameNumbers('CarAni', { frames: [0] }),
+        frameRate: 20
+
+    });
+
+
+      this.anims.create({
+          key: "right",
+          frames: this.anims.generateFrameNumbers('CarAni', { frames: [5,6,7] }),
+          frameRate: 20
+
+      });
+
+      this.anims.create({
+          key: "left",
+          frames: this.anims.generateFrameNumbers('CarAni', { frames: [8,9,10] }),
+          frameRate: 20
+
+      });
     //create player
-    player = new Player(this,400,420,"player");
+    player = new Player(this, 400, 420);
+
     player.initialize();
     player.body.label = "player";
 
@@ -94,7 +128,7 @@ class MyGame extends Phaser.Scene {
     speedAnim = this.add.sprite(520, 566).setScrollFactor(0);
     speedAnim.setScale(1);
     speedAnim.play('start');
-
+     
     // tween animations
     this.tweens.add({
       targets: fuel,
@@ -183,7 +217,25 @@ class MyGame extends Phaser.Scene {
     if (player.body.speed < 2.7)
     {
       speedAnim.setFrame(2);
-    }
+      }
+
+      if (player.body.speed > 3.4 && player.body.speed < 3.8 && !arrowKeys.right.isDown && !Dkey.isDown) {
+          player.play('fast');
+      }
+
+      if (player.body.speed <= 3.4 && !arrowKeys.left.isDown && !Akey.isDown &&  !arrowKeys.right.isDown && !Dkey.isDown) {
+          player.play('slow');
+      }
+
+      if ( arrowKeys.left.isDown || Akey.isDown) {
+          player.play('left');
+      }
+
+      if (arrowKeys.right.isDown || Dkey.isDown) {
+          player.play('right');
+      }
+
+
 
     var pointer = this.input.activePointer;
     debugText2.setText([
