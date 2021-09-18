@@ -9,6 +9,7 @@ import cashImg from './assets/Cash.png';
 import Player from "./Player.js"
 import Cop from './Cop.js';
 import "./index.css";
+import dashImg from "./assets/dash.png";
 
 var player;
 var Dtrail;
@@ -21,6 +22,7 @@ var scoreText;
 var score;
 var debugText;
 var debugText2;
+var dash;
 
 // Represents Game Scene
 class MyGame extends Phaser.Scene {
@@ -35,9 +37,11 @@ class MyGame extends Phaser.Scene {
     this.load.image('speed', SpeedImg);
     this.load.spritesheet('SpeedD', SpeedImg, {frameWidth: 128, frameHeight: 128});
     this.load.image("copBW", copBWImg);
-    this.load.image("cash", cashImg);
+      this.load.image("cash", cashImg);
+      this.load.image("dash", dashImg);
     this.load.image("tiles", tileImg);
-    this.load.tilemapTiledJSON('map', mapJSON);
+      this.load.tilemapTiledJSON('map', mapJSON);
+
   }
 
   create() {
@@ -69,9 +73,10 @@ class MyGame extends Phaser.Scene {
     copBW.initialize();
     
     // create user interface
+    dash = this.add.sprite(400, 340, 'dash').setScrollFactor(0);
     scoreText = this.add.text(10,0,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
     score = 0;
-    var graphics = new Phaser.Geom.Rectangle(0, 30, 150, 25);
+      var graphics = new Phaser.Geom.Rectangle(270, 510, 150, 20);
     var fuel = this.add.graphics({ fillStyle: { color: 0x00ff00 } }).setScrollFactor(0);
     fuel.fillRectShape(graphics);
 
@@ -81,7 +86,7 @@ class MyGame extends Phaser.Scene {
       frames: this.anims.generateFrameNumbers('SpeedD', {frames: [2,4,6,8,10,12,14,16,18]}),
       frameRate: 20
     });
-    speedAnim = this.add.sprite(736, 576).setScrollFactor(0);
+    speedAnim = this.add.sprite(520, 566).setScrollFactor(0);
     speedAnim.setScale(1);
     speedAnim.play('start');
 
