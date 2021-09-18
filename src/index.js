@@ -113,7 +113,7 @@ class MyGame extends Phaser.Scene {
     
     // create user interface
     dash = this.add.sprite(400, 340, 'dash').setScrollFactor(0);
-    scoreText = this.add.text(10,0,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
+    scoreText = this.add.text(200,580,'', {font: '30px Courier', fill: '#ffffff'}).setScrollFactor(0);
     score = 0;
     var graphics = new Phaser.Geom.Rectangle(270, 510, 150, 20);
     var fuel = this.add.graphics({ fillStyle: { color: 0x00ff00 } }).setScrollFactor(0);
