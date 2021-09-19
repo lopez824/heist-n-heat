@@ -24,6 +24,8 @@ var dash;
 var arrowKeys;
 var Akey;
 var Dkey;
+var xGridPos;
+var yGridPos;
 var debugText;
 var debugText2;
 
@@ -50,8 +52,10 @@ class MyGame extends Phaser.Scene {
   }
 
   create() {
+    // play background music
     var music = this.sound.add('music');
     music.play();
+
     // initialize map
     var map = this.make.tilemap({key:'map'});
     const tileset = map.addTilesetImage('Tilesheet','tiles');
@@ -66,47 +70,26 @@ class MyGame extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     
     // create collectibles
-    const cash1 = this.matter.add.sprite(230, 210,'cash').setStatic(true).setSensor(true);
-    cash1.body.label = 'cash';
-    const cash2 = this.matter.add.sprite(552, 175,'cash').setStatic(true).setSensor(true);
-    cash2.body.label = 'cash';
-    const cash3 = this.matter.add.sprite(430, 450,'cash').setStatic(true).setSensor(true);
-    cash3.body.label = 'cash';
+    const cashCount = 100;
+    const cashColumns = 10;
+    const cashColSpacing = 300;
+    const cashRowSpacing = 300;
+    createGridPositions(cashCount, cashColumns, cashColSpacing, cashRowSpacing, 150, 150);
 
-    // create sensors for AI
-    const sensorCount = 100;
-    const columns = 10;
-    const sensorX = [];
-    const sensorY = [];
-    var colSpacing = 300;
-    var rowSpacing = 300;
-    
-    for (let i = 0; i < sensorCount; i++) {
-      if (i == 0) {
-        sensorX[i] = colSpacing;
-        sensorY[i] = rowSpacing;
-      }
-      else if (i%columns == 0) {
-        colSpacing = 300;
-        rowSpacing += 300;
-        sensorX[i] = colSpacing;
-        sensorY[i] = rowSpacing;
-      }
-      else {
-        colSpacing += 300;
-        sensorX[i] = colSpacing;
-        sensorY[i] = rowSpacing;
-      }
-      
+    for (let i = 0; i < cashCount; i++) {
+      const cash = this.matter.add.image(xGridPos[i], yGridPos[i], 'cash').setStatic(true).setSensor(true);
+      cash.body.label = "cash";
     }
 
-    /* for (let i = 0; i < sensorCount; i++) {
-      console.log("SensorPos: " + sensorX[i] + ", " + sensorY[i]);
-    } */
+    // create sensors
+    const sensorCount = 100;
+    const sensorColumns = 10;
+    const sensorColSpacing = 300;
+    const sensorRowSpacing = 300;
+    createGridPositions(sensorCount, sensorColumns, sensorColSpacing, sensorRowSpacing, 300, 300);
 
     for (let i = 0; i < sensorCount; i++) {
-      // TODO: create sensors and position them
-      const sensor = this.matter.add.image(sensorX[i], sensorY[i], 'sensor').setStatic(true).setSensor(true);
+      const sensor = this.matter.add.image(xGridPos[i], yGridPos[i], 'sensor').setStatic(true).setSensor(true);
       sensor.setScale(4);
       sensor.body.label = "sensor";
     }
@@ -184,7 +167,7 @@ class MyGame extends Phaser.Scene {
     // collision listeners
     this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
       debugText.setText("Hit: " + bodyA.label);
-      if (bodyA.label == "Rectangle Body") {
+      if (bodyA.label == "Rectangle Body") {    // check if colliding with Tilemap sprite
         if (bodyA.gameObject != null) {
           if (bodyA.gameObject.tile.properties.name == "sign") {
             debugText.setText("Hit: " + bodyA.gameObject.tile.properties.name);
@@ -209,8 +192,9 @@ class MyGame extends Phaser.Scene {
 
     debugText = this.add.text(10,10,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
     debugText2 = this.add.text(10,30,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
-    
-    this.matter.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);   // world bounds
+
+    // world bounds
+    this.matter.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);   
   }
 
   update() {
@@ -281,6 +265,31 @@ class MyGame extends Phaser.Scene {
       'x: ' + pointer.worldX,
       'y: ' + pointer.worldY
   ]);
+  }
+}
+
+function createGridPositions(count, columns, columnSpacing, rowSpacing, initialX, initialY) {
+  var X = initialX;
+  var Y = initialY;
+  xGridPos = [];
+  yGridPos = [];
+  
+  for (let i = 0; i < count; i++) {
+    if (i == 0) {
+      xGridPos[i] = initialX;
+      yGridPos[i] = initialY;
+    }
+    else if (i%columns == 0) {  // new row
+      X = initialX;
+      Y += rowSpacing;
+      xGridPos[i] = X;
+      yGridPos[i] = Y;
+    }
+    else {
+      X += columnSpacing;
+      xGridPos[i] = X;
+      yGridPos[i] = Y;
+    }
   }
 }
 
