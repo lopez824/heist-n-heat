@@ -60,13 +60,17 @@ class MyGame extends Phaser.Scene {
     // initialize map
     var map = this.make.tilemap({key:'map'});
     const tileset = map.addTilesetImage('Tilesheet','tiles');
-    map.createLayer('Background', tileset,0,0); 
-    map.createLayer('Buildings', tileset,0,0); 
-    const layer = map.createLayer('Obstacles', tileset,0,0); 
+    map.createLayer('BACKGROUND', tileset,0,0); 
+    const bottom = map.createLayer('buildingsbottom', tileset,0,0); 
+    map.createLayer('Road', tileset,0,0); 
+    const buildings = map.createLayer('Buildings', tileset,0,0); 
+    map.createLayer('Props', tileset,0,0); 
 
     // sets Collisions from tileset data
-    layer.setCollisionFromCollisionGroup();
-    this.matter.world.convertTilemapLayer(layer);
+    bottom.setCollisionFromCollisionGroup();
+    buildings.setCollisionFromCollisionGroup();
+    this.matter.world.convertTilemapLayer(bottom);
+    this.matter.world.convertTilemapLayer(buildings);
 
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     
@@ -75,7 +79,7 @@ class MyGame extends Phaser.Scene {
     const cashColumns = 10;
     const cashColSpacing = 300;
     const cashRowSpacing = 300;
-    createGridPositions(cashCount, cashColumns, cashColSpacing, cashRowSpacing, 150, 150);
+    createGridPositions(cashCount, cashColumns, cashColSpacing, cashRowSpacing, 150, 100);
 
     for (let i = 0; i < cashCount; i++) {
       const cash = this.matter.add.image(xGridPos[i], yGridPos[i], 'cash').setStatic(true).setSensor(true);
@@ -123,12 +127,12 @@ class MyGame extends Phaser.Scene {
     });
 
     //create player car
-    player = new Player(this, 400, 420);
+    player = new Player(this, 600, 420);
     player.initialize();
     player.body.label = "player";
 
     // TODO: create multiple cops
-    copBW = new Cop(this, 200, 320, "copBW");
+    copBW = new Cop(this, 300, 420, "copBW");
     copBW.initialize();
     copBW.body.label = "cop";
     
@@ -179,7 +183,7 @@ class MyGame extends Phaser.Scene {
       else {
         if (bodyA.label == "sensor" && bodyB.label == "cop") {    // manage cop AI
           console.log("AI sensor triggered");
-          
+          bodyB.gameObject.setTurning(true);
         }
         if (bodyA.label == "cop" && bodyB.label == "cop") {
           console.log("Hit: " + bodyA.label);   // TODO: destroy cop
@@ -310,7 +314,7 @@ const config = {
   physics: {
     default: 'matter',
     matter: {
-      debug: true,
+      debug: false,
       fps:60,
       gravity: {x:0,y:0}
     }

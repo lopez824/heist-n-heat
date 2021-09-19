@@ -1,3 +1,4 @@
+var turning;
 var direction;
 
 export default class Player extends Phaser.Physics.Matter.Sprite {
@@ -9,6 +10,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
     // sets MatterJS properties
     initialize() {
         direction = "Up";
+        turning = false;
         this.setBody({    
             type: 'rectangle',
             width: 90,
@@ -36,6 +38,11 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         else if (this.angle >= -110 && this.angle <= -70) {
             direction = "Up";
         }
+        
+    }
+
+    isTurning() {
+        return turning;
     }
 
     // returns player direction

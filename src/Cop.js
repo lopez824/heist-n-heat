@@ -1,4 +1,5 @@
 var inPursuit;
+var isTurning;
 var direction;
 
 export default class Cop extends Phaser.Physics.Matter.Sprite {
@@ -25,26 +26,42 @@ export default class Cop extends Phaser.Physics.Matter.Sprite {
 
     // sets cop direction, AI state, and speed
     update(player) {
-        this.thrust(0.042);
+        const distance = Math.sqrt((Math.pow((player.x - this.x),2)) + (Math.pow((player.y - this.y),2)));
+
+        if (isTurning) {
+            this.thrust(0.040)
+        }
+        else {
+            this.thrust(0.041);
+        }
+        if (distance < 200) {
+            inPursuit = true;
+        }
+        //console.log(distance);
         if (this.angle >= -20 && this.angle <= 20) {
             direction = "Right";
         }
-        else if (this.angle >= 70 && this.angle <= 110) {
+        else if (this.angle >= 30 && this.angle <= 110) {
             direction = "Down";
         }
         else if (this.angle >= 160 || this.angle <= -160) {
             direction = "Left";
         }
-        else if (this.angle >= -110 && this.angle <= -70) {
+        else if (this.angle >= -110 && this.angle <= -30) {
             direction = "Up";
         }
-        if (inPursuit && this.direction == player.getDirection()) {
+        if (inPursuit && direction) {
             const theta = Math.atan2((player.y - this.y), (player.x - this.x));
             this.angle = theta*(180/Math.PI);
         }
         else {
 
         }
+        console.log("player: " + player.getDirection() + ", cop: " + direction);
+    }
+
+    setTurning(turning) {
+        isTurning = turning;
     }
 
     // toggles chase state for cop
