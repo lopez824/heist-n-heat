@@ -26,6 +26,7 @@ var Akey;
 var Dkey;
 var xGridPos;
 var yGridPos;
+const cashArray = [];
 var debugText;
 var debugText2;
 
@@ -79,9 +80,10 @@ class MyGame extends Phaser.Scene {
     for (let i = 0; i < cashCount; i++) {
       const cash = this.matter.add.image(xGridPos[i], yGridPos[i], 'cash').setStatic(true).setSensor(true);
       cash.body.label = "cash";
+      //cashArray.push(cash);   // TODO: use new array for respawning?
     }
 
-    // create sensors
+    // create sensors for AI
     const sensorCount = 100;
     const sensorColumns = 10;
     const sensorColSpacing = 300;
@@ -94,7 +96,7 @@ class MyGame extends Phaser.Scene {
       sensor.body.label = "sensor";
     }
 
-    // player car animations
+    // create player car animations
     this.anims.create({
       key: "slow",
       frames: this.anims.generateFrameNumbers('CarAni', { frames: [0] }),
@@ -125,7 +127,7 @@ class MyGame extends Phaser.Scene {
     player.initialize();
     player.body.label = "player";
 
-    // create cop
+    // TODO: create multiple cops
     copBW = new Cop(this, 200, 320, "copBW");
     copBW.initialize();
     copBW.body.label = "cop";
@@ -167,7 +169,7 @@ class MyGame extends Phaser.Scene {
     // collision listeners
     this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
       debugText.setText("Hit: " + bodyA.label);
-      if (bodyA.label == "Rectangle Body") {    // check if colliding with Tilemap sprite
+      if (bodyA.label == "Rectangle Body") {    // checks if colliding with Tilemap sprite
         if (bodyA.gameObject != null) {
           if (bodyA.gameObject.tile.properties.name == "sign") {
             debugText.setText("Hit: " + bodyA.gameObject.tile.properties.name);
@@ -175,17 +177,20 @@ class MyGame extends Phaser.Scene {
         }
       }
       else {
-        if (bodyA.label == "sensor" && bodyB.label == "cop") {
+        if (bodyA.label == "sensor" && bodyB.label == "cop") {    // manage cop AI
           console.log("AI sensor triggered");
           
         }
-        if (bodyA.label == "cash" && bodyB.label == "player") {
+        if (bodyA.label == "cop" && bodyB.label == "cop") {
+          console.log("Hit: " + bodyA.label);   // TODO: destroy cop
+        }
+        if (bodyA.label == "cash" && bodyB.label == "player") {   // collect cash
           score += 100;
           scoreText.setText('Score: $' + score);
           bodyA.gameObject.destroy();
         }
         if (bodyA.label == "player" && bodyB.label == "cop") {
-          debugText.setText("Hit: " + bodyA.label);
+          debugText.setText("Hit: " + bodyA.label);   // TODO: destroy player
         }
       }
     });
@@ -279,13 +284,13 @@ function createGridPositions(count, columns, columnSpacing, rowSpacing, initialX
       xGridPos[i] = initialX;
       yGridPos[i] = initialY;
     }
-    else if (i%columns == 0) {  // new row
+    else if (i%columns == 0) {    // iterate row
       X = initialX;
       Y += rowSpacing;
       xGridPos[i] = X;
       yGridPos[i] = Y;
     }
-    else {
+    else {    // iterate column
       X += columnSpacing;
       xGridPos[i] = X;
       yGridPos[i] = Y;

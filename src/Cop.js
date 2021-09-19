@@ -23,7 +23,7 @@ export default class Cop extends Phaser.Physics.Matter.Sprite {
         this.setFixedRotation();
     }
 
-    // sets cop direction, AI, and speed
+    // sets cop direction, AI state, and speed
     update(player) {
         this.thrust(0.042);
         if (this.angle >= -20 && this.angle <= 20) {
@@ -38,12 +38,16 @@ export default class Cop extends Phaser.Physics.Matter.Sprite {
         else if (this.angle >= -110 && this.angle <= -70) {
             direction = "Up";
         }
-        if (inPursuit) {
+        if (inPursuit && this.direction == player.getDirection()) {
             const theta = Math.atan2((player.y - this.y), (player.x - this.x));
             this.angle = theta*(180/Math.PI);
         }
+        else {
+
+        }
     }
 
+    // toggles chase state for cop
     setChase(isChasing) {
         inPursuit = isChasing;
     }
