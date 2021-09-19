@@ -9,6 +9,7 @@ import copBWImg from "./assets/copBW.png";
 import DftImg from './assets/drift_trail.png';
 import SpeedImg from './assets/spd.png';
 import cashImg from './assets/Cash.png';
+import sensorImg from './assets/Sensor.png';
 import dashImg from "./assets/dash.png";
 import CarAImg from "./assets/Car_ani.png";
 import musicMP3 from './assets/track27.mp3'
@@ -41,6 +42,7 @@ class MyGame extends Phaser.Scene {
     this.load.image("dash", dashImg);
     this.load.image("dft", DftImg);
     this.load.image('speed', SpeedImg);
+    this.load.image('sensor', sensorImg);
     this.load.image("tiles", tileImg);
     this.load.spritesheet('SpeedD', SpeedImg, { frameWidth: 128, frameHeight: 128 });
     this.load.spritesheet('CarAni', CarAImg, { frameWidth: 128, frameHeight: 128 });
@@ -72,9 +74,14 @@ class MyGame extends Phaser.Scene {
     cash3.body.label = 'cash';
 
     // create sensors for AI
-    const aiSensorPos = [];
-    const aiSensorY = [];
+    const aiSensorX = 500;
+    const aiSensorY = 200;
     const sensorCount = 20;
+    for (let i = 0; i < 1; i++) {
+      // TODO: create sensors and position them
+      const sensor = this.matter.add.image(aiSensorX, aiSensorY, 'sensor').setStatic(true).setSensor(true);
+      sensor.body.label = "sensor";
+    }
 
     // player car animations
     this.anims.create({
@@ -148,6 +155,7 @@ class MyGame extends Phaser.Scene {
 
     // collision listeners
     this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
+      debugText.setText("Hit: " + bodyA.label);
       if (bodyA.label == "Rectangle Body") {
         if (bodyA.gameObject != null) {
           if (bodyA.gameObject.tile.properties.name == "sign") {
