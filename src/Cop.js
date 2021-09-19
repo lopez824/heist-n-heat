@@ -9,7 +9,7 @@ export default class Cop extends Phaser.Physics.Matter.Sprite {
 
     // sets MatterJS properties
     initialize() {
-        inPursuit = true;
+        inPursuit = false;
         direction = "Up";
         this.setBody({    
             type: 'rectangle',

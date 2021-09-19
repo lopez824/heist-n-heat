@@ -15,7 +15,6 @@ import CarAImg from "./assets/Car_ani.png"
 var player;
 var Dtrail;
 var speedAnim;
-var CarAnim;
 var copBW;
 var arrowKeys;
 var Akey;
@@ -25,7 +24,6 @@ var score;
 var debugText;
 var debugText2;
 var dash;
-var key4CarAnim;
 
 // Represents Game Scene
 class MyGame extends Phaser.Scene {
@@ -73,28 +71,29 @@ class MyGame extends Phaser.Scene {
 
     // car animations
     this.anims.create({
+      key: "slow",
+      frames: this.anims.generateFrameNumbers('CarAni', { frames: [0] }),
+      frameRate: 20
+      
+  });
+    this.anims.create({
         key: "fast",
         frames: this.anims.generateFrameNumbers('CarAni', { frames: [1, 2, 3] }),
-        frameRate: 1,
-        repeat: 20
-
-    });
-    this.anims.create({
-        key: "slow",
-        frames: this.anims.generateFrameNumbers('CarAni', { frames: [0] }),
-        frameRate: 20
-
+        frameRate: 20,
+        repeat: -1
     });
     this.anims.create({
       key: "right",
-      frames: this.anims.generateFrameNumbers('CarAni', { frames: [5,6,7] }),
-      frameRate: 20
+      frames: this.anims.generateFrameNumbers('CarAni', { frames: [4,5,6] }),
+      frameRate: 20,
+      repeat: -1
 
     });
     this.anims.create({
       key: "left",
-      frames: this.anims.generateFrameNumbers('CarAni', { frames: [8,9,10] }),
-      frameRate: 20
+      frames: this.anims.generateFrameNumbers('CarAni', { frames: [7,8,9] }),
+      frameRate: 20,
+      repeat: -1
     });
 
     //create player
@@ -161,8 +160,8 @@ class MyGame extends Phaser.Scene {
       }
     });
 
-    debugText = this.add.text(10,60,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
-    debugText2 = this.add.text(10,80,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
+    debugText = this.add.text(10,10,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
+    debugText2 = this.add.text(10,30,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
     
     this.matter.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);   // world bounds
   }
@@ -218,19 +217,19 @@ class MyGame extends Phaser.Scene {
     }
 
     if (player.body.speed > 3.4 && player.body.speed < 3.8 && !arrowKeys.right.isDown && !Dkey.isDown) {
-        player.play('fast');
+      player.play('fast',true);
     }
 
     if (player.body.speed <= 3.4 && !arrowKeys.left.isDown && !Akey.isDown &&  !arrowKeys.right.isDown && !Dkey.isDown) {
-        player.play('slow');
+      player.play('slow');
     }
 
     if ( arrowKeys.left.isDown || Akey.isDown) {
-        player.play('left');
+      player.play('left',true);
     }
 
     if (arrowKeys.right.isDown || Dkey.isDown) {
-        player.play('right');
+      player.play('right',true);
     }
 
     var pointer = this.input.activePointer;
