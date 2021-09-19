@@ -1,4 +1,7 @@
+import "./index.css";
 import Phaser from "phaser";
+import Player from "./Player.js"
+import Cop from './Cop.js';
 import mapJSON from "./assets/map.json";
 import tileImg from "./assets/Tilesheet.png"
 import playerImg from "./assets/Car_Placeholder.png";
@@ -6,24 +9,22 @@ import copBWImg from "./assets/copBW.png";
 import DftImg from './assets/drift_trail.png';
 import SpeedImg from './assets/spd.png';
 import cashImg from './assets/Cash.png';
-import Player from "./Player.js"
-import Cop from './Cop.js';
-import "./index.css";
 import dashImg from "./assets/dash.png";
-import CarAImg from "./assets/Car_ani.png"
+import CarAImg from "./assets/Car_ani.png";
+import musicMP3 from './assets/track27.mp3'
 
 var player;
+var copBW;
 var Dtrail;
 var speedAnim;
-var copBW;
+var scoreText;
+var score;
+var dash;
 var arrowKeys;
 var Akey;
 var Dkey;
-var scoreText;
-var score;
 var debugText;
 var debugText2;
-var dash;
 
 // Represents Game Scene
 class MyGame extends Phaser.Scene {
@@ -33,21 +34,22 @@ class MyGame extends Phaser.Scene {
   }
   
   preload() {
+    this.load.audio('music', musicMP3);
     this.load.image("player", playerImg);
-    this.load.image("dft", DftImg);
-    this.load.image('speed', SpeedImg);
-    this.load.spritesheet('SpeedD', SpeedImg, { frameWidth: 128, frameHeight: 128 });
-    this.load.spritesheet('CarAni', CarAImg, { frameWidth: 128, frameHeight: 128 });
     this.load.image("copBW", copBWImg);
     this.load.image("cash", cashImg);
     this.load.image("dash", dashImg);
+    this.load.image("dft", DftImg);
+    this.load.image('speed', SpeedImg);
     this.load.image("tiles", tileImg);
+    this.load.spritesheet('SpeedD', SpeedImg, { frameWidth: 128, frameHeight: 128 });
+    this.load.spritesheet('CarAni', CarAImg, { frameWidth: 128, frameHeight: 128 });
     this.load.tilemapTiledJSON('map', mapJSON);
-
   }
 
   create() {
-
+    var music = this.sound.add('music');
+    music.play();
     // initialize map
     var map = this.make.tilemap({key:'map'});
     const tileset = map.addTilesetImage('Tilesheet','tiles');
@@ -69,12 +71,16 @@ class MyGame extends Phaser.Scene {
     const cash3 = this.matter.add.sprite(430, 450,'cash').setStatic(true).setSensor(true);
     cash3.body.label = 'cash';
 
-    // car animations
+    // create sensors for AI
+    const aiSensorPos = [];
+    const aiSensorY = [];
+    const sensorCount = 20;
+
+    // player car animations
     this.anims.create({
       key: "slow",
       frames: this.anims.generateFrameNumbers('CarAni', { frames: [0] }),
       frameRate: 20
-      
   });
     this.anims.create({
         key: "fast",
@@ -96,9 +102,8 @@ class MyGame extends Phaser.Scene {
       repeat: -1
     });
 
-    //create player
+    //create player car
     player = new Player(this, 400, 420);
-
     player.initialize();
     player.body.label = "player";
 
@@ -111,6 +116,7 @@ class MyGame extends Phaser.Scene {
     dash = this.add.sprite(400, 340, 'dash').setScrollFactor(0);
     scoreText = this.add.text(200,580,'', {font: '30px Courier', fill: '#ffffff'}).setScrollFactor(0);
     score = 0;
+    scoreText.setText('Score: $' + score);
     var graphics = new Phaser.Geom.Rectangle(270, 510, 150, 20);
     var fuel = this.add.graphics().setScrollFactor(0);
     fuel.fillGradientStyle(0xFFFF00, 0x00FF00, 1);
@@ -126,7 +132,7 @@ class MyGame extends Phaser.Scene {
     speedAnim.setScale(1);
     speedAnim.play('start');
      
-    // tween animations
+    // fuel animation
     this.tweens.add({
       targets: fuel,
       scaleX: 0,
@@ -152,6 +158,7 @@ class MyGame extends Phaser.Scene {
       else {
         if (bodyA.label == "cash" && bodyB.label == "player") {
           score += 100;
+          scoreText.setText('Score: $' + score);
           bodyA.gameObject.destroy();
         }
         if (bodyA.label == "player" && bodyB.label == "cop") {
@@ -171,6 +178,7 @@ class MyGame extends Phaser.Scene {
     player.update();
     copBW.update(player);
 
+    // player turning
     if (arrowKeys.left.isDown || Akey.isDown)
     {
       player.angle -= 4;
@@ -182,9 +190,7 @@ class MyGame extends Phaser.Scene {
       Dtrail = this.add.sprite(player.x, player.y, "dft");
     }
 
-    scoreText.setText('Score: $' + score);
-
-    // updates speedometer
+    // animates speedometer
     if (player.body.speed > 3.6 && player.body.speed < 3.7) {
       speedAnim.setFrame(18);
     }
@@ -216,18 +222,16 @@ class MyGame extends Phaser.Scene {
       speedAnim.setFrame(2);
     }
 
+    // animates exhaust
     if (player.body.speed > 3.4 && player.body.speed < 3.8 && !arrowKeys.right.isDown && !Dkey.isDown) {
       player.play('fast',true);
     }
-
     if (player.body.speed <= 3.4 && !arrowKeys.left.isDown && !Akey.isDown &&  !arrowKeys.right.isDown && !Dkey.isDown) {
       player.play('slow');
     }
-
     if ( arrowKeys.left.isDown || Akey.isDown) {
       player.play('left',true);
     }
-
     if (arrowKeys.right.isDown || Dkey.isDown) {
       player.play('right',true);
     }

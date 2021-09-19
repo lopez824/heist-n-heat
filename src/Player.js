@@ -21,6 +21,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         this.setFixedRotation();
     }
 
+    // Sets player direction for cop AI and speed
     update() {
         this.thrust(0.04);
         if (this.angle >= -20 && this.angle <= 20) {
@@ -37,6 +38,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         }
     }
 
+    // returns player direction
     getDirection() {
         return direction;
     }
