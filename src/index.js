@@ -74,12 +74,40 @@ class MyGame extends Phaser.Scene {
     cash3.body.label = 'cash';
 
     // create sensors for AI
-    const aiSensorX = 500;
-    const aiSensorY = 200;
-    const sensorCount = 20;
-    for (let i = 0; i < 1; i++) {
+    const sensorCount = 100;
+    const columns = 10;
+    const sensorX = [];
+    const sensorY = [];
+    var colSpacing = 300;
+    var rowSpacing = 300;
+    
+    for (let i = 0; i < sensorCount; i++) {
+      if (i == 0) {
+        sensorX[i] = colSpacing;
+        sensorY[i] = rowSpacing;
+      }
+      else if (i%columns == 0) {
+        colSpacing = 300;
+        rowSpacing += 300;
+        sensorX[i] = colSpacing;
+        sensorY[i] = rowSpacing;
+      }
+      else {
+        colSpacing += 300;
+        sensorX[i] = colSpacing;
+        sensorY[i] = rowSpacing;
+      }
+      
+    }
+
+    /* for (let i = 0; i < sensorCount; i++) {
+      console.log("SensorPos: " + sensorX[i] + ", " + sensorY[i]);
+    } */
+
+    for (let i = 0; i < sensorCount; i++) {
       // TODO: create sensors and position them
-      const sensor = this.matter.add.image(aiSensorX, aiSensorY, 'sensor').setStatic(true).setSensor(true);
+      const sensor = this.matter.add.image(sensorX[i], sensorY[i], 'sensor').setStatic(true).setSensor(true);
+      sensor.setScale(4);
       sensor.body.label = "sensor";
     }
 
@@ -115,7 +143,7 @@ class MyGame extends Phaser.Scene {
     player.body.label = "player";
 
     // create cop
-    copBW = new Cop(this, 200,420,"copBW");
+    copBW = new Cop(this, 200, 320, "copBW");
     copBW.initialize();
     copBW.body.label = "cop";
     
@@ -164,6 +192,10 @@ class MyGame extends Phaser.Scene {
         }
       }
       else {
+        if (bodyA.label == "sensor" && bodyB.label == "cop") {
+          console.log("AI sensor triggered");
+          
+        }
         if (bodyA.label == "cash" && bodyB.label == "player") {
           score += 100;
           scoreText.setText('Score: $' + score);
@@ -258,6 +290,9 @@ const config = {
   parent: "gameContainer",
   width: 800,
   height: 640,
+  audio: {
+    disableWebAudio: true
+  },
   physics: {
     default: 'matter',
     matter: {

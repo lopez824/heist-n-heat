@@ -44,6 +44,10 @@ export default class Cop extends Phaser.Physics.Matter.Sprite {
         }
     }
 
+    setChase(isChasing) {
+        inPursuit = isChasing;
+    }
+
     // returns direction of cop
     getDirection() {
         return direction;
