@@ -14,8 +14,8 @@ export default class Cop extends Phaser.Physics.Matter.Sprite {
         direction = "Up";
         this.setBody({    
             type: 'rectangle',
-            width: 32,
-            height: 22
+            width: 28,
+            height: 20
           });
 
         this.setScale(1.25);
@@ -57,7 +57,7 @@ export default class Cop extends Phaser.Physics.Matter.Sprite {
         else {
 
         }
-        console.log("player: " + player.getDirection() + ", cop: " + direction);
+        //console.log("player: " + player.getDirection() + ", cop: " + direction);
     }
 
     setTurning(turning) {

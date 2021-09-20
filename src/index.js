@@ -60,26 +60,23 @@ class MyGame extends Phaser.Scene {
     // initialize map
     var map = this.make.tilemap({key:'map'});
     const tileset = map.addTilesetImage('Tilesheet','tiles');
-    map.createLayer('BACKGROUND', tileset,0,0); 
-    const bottom = map.createLayer('buildingsbottom', tileset,0,0); 
-    map.createLayer('Road', tileset,0,0); 
+    map.createLayer('Background', tileset,0,0); 
+    map.createLayer('Roads', tileset,0,0); 
     const buildings = map.createLayer('Buildings', tileset,0,0); 
     map.createLayer('Props', tileset,0,0); 
 
     // sets Collisions from tileset data
-    bottom.setCollisionFromCollisionGroup();
     buildings.setCollisionFromCollisionGroup();
-    this.matter.world.convertTilemapLayer(bottom);
     this.matter.world.convertTilemapLayer(buildings);
 
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     
     // create collectibles
-    const cashCount = 100;
-    const cashColumns = 10;
-    const cashColSpacing = 300;
-    const cashRowSpacing = 300;
-    createGridPositions(cashCount, cashColumns, cashColSpacing, cashRowSpacing, 150, 100);
+    const cashCount = 9;
+    const cashColumns = 3;
+    const cashColSpacing = 1375;
+    const cashRowSpacing = 1375;
+    createGridPositions(cashCount, cashColumns, cashColSpacing, cashRowSpacing, 225, 225);
 
     for (let i = 0; i < cashCount; i++) {
       const cash = this.matter.add.image(xGridPos[i], yGridPos[i], 'cash').setStatic(true).setSensor(true);
@@ -88,11 +85,11 @@ class MyGame extends Phaser.Scene {
     }
 
     // create sensors for AI
-    const sensorCount = 100;
-    const sensorColumns = 10;
-    const sensorColSpacing = 300;
-    const sensorRowSpacing = 300;
-    createGridPositions(sensorCount, sensorColumns, sensorColSpacing, sensorRowSpacing, 300, 300);
+    const sensorCount = 9;
+    const sensorColumns = 3;
+    const sensorColSpacing = 1375;
+    const sensorRowSpacing = 1350;
+    createGridPositions(sensorCount, sensorColumns, sensorColSpacing, sensorRowSpacing, 225, 225);
 
     for (let i = 0; i < sensorCount; i++) {
       const sensor = this.matter.add.image(xGridPos[i], yGridPos[i], 'sensor').setStatic(true).setSensor(true);
@@ -127,21 +124,22 @@ class MyGame extends Phaser.Scene {
     });
 
     //create player car
-    player = new Player(this, 600, 420);
+    player = new Player(this, 600, 1650);
     player.initialize();
     player.body.label = "player";
 
     // TODO: create multiple cops
-    copBW = new Cop(this, 300, 420, "copBW");
+    copBW = new Cop(this, 300, 1650, "copBW");
     copBW.initialize();
     copBW.body.label = "cop";
     
     // create user interface
-    dash = this.add.sprite(400, 340, 'dash').setScrollFactor(0);
-    scoreText = this.add.text(200,580,'', {font: '30px Courier', fill: '#ffffff'}).setScrollFactor(0);
+    dash = this.add.sprite(400, 370, 'dash').setScrollFactor(0);
+    dash.setScale(0.9)
+    scoreText = this.add.text(215,580,'', {font: '30px Courier', fill: '#ffffff'}).setScrollFactor(0);
     score = 0;
     scoreText.setText('Score: $' + score);
-    var graphics = new Phaser.Geom.Rectangle(270, 510, 150, 20);
+    var graphics = new Phaser.Geom.Rectangle(282, 525, 138, 18);
     var fuel = this.add.graphics().setScrollFactor(0);
     fuel.fillGradientStyle(0xFFFF00, 0x00FF00, 1);
     fuel.fillRectShape(graphics);
@@ -152,15 +150,15 @@ class MyGame extends Phaser.Scene {
       frames: this.anims.generateFrameNumbers('SpeedD', {frames: [2,4,6,8,10,12,14,16,18]}),
       frameRate: 20
     });
-    speedAnim = this.add.sprite(520, 566).setScrollFactor(0);
-    speedAnim.setScale(1);
+    speedAnim = this.add.sprite(505, 576).setScrollFactor(0);
+    speedAnim.setScale(.9);
     speedAnim.play('start');
      
     // fuel animation
     this.tweens.add({
       targets: fuel,
       scaleX: 0,
-      x: 270,
+      x: 282,
       ease: 'Linear',
       duration: 30000
     });
@@ -194,7 +192,7 @@ class MyGame extends Phaser.Scene {
           bodyA.gameObject.destroy();
         }
         if (bodyA.label == "player" && bodyB.label == "cop") {
-          debugText.setText("Hit: " + bodyA.label);   // TODO: destroy player
+          debugText.setText("Hit: " + bodyB.label);   // TODO: destroy player
         }
       }
     });
@@ -203,7 +201,7 @@ class MyGame extends Phaser.Scene {
     debugText2 = this.add.text(10,30,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
 
     // world bounds
-    this.matter.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);   
+    this.matter.world.setBounds(124, 124, map.widthInPixels - 248, map.heightInPixels - 248);   
   }
 
   update() {
@@ -214,12 +212,12 @@ class MyGame extends Phaser.Scene {
     // player turning
     if (arrowKeys.left.isDown || Akey.isDown)
     {
-      player.angle -= 4;
+      player.angle -= 3;
       Dtrail = this.add.sprite(player.x, player.y, "dft");
     }
     else if (arrowKeys.right.isDown || Dkey.isDown)
     {
-      player.angle += 4;
+      player.angle += 3;
       Dtrail = this.add.sprite(player.x, player.y, "dft");
     }
 

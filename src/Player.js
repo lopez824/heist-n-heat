@@ -13,8 +13,8 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         turning = false;
         this.setBody({    
             type: 'rectangle',
-            width: 90,
-            height: 50
+            width: 86,
+            height: 46
           });
 
         this.setScale(0.5);
@@ -38,7 +38,6 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         else if (this.angle >= -110 && this.angle <= -70) {
             direction = "Up";
         }
-        
     }
 
     isTurning() {
