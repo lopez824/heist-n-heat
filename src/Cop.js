@@ -1,6 +1,7 @@
 var inPursuit;
 var isTurning;
 var direction;
+var speed;
 
 export default class Cop extends Phaser.Physics.Matter.Sprite {
     constructor(scene, x, y, texture) {
@@ -9,7 +10,8 @@ export default class Cop extends Phaser.Physics.Matter.Sprite {
     }
 
     // sets MatterJS properties
-    initialize() {
+    initialize(s) {
+        speed = s;
         inPursuit = false;
         direction = "Up";
         this.setBody({    
@@ -29,10 +31,10 @@ export default class Cop extends Phaser.Physics.Matter.Sprite {
         const distance = Math.sqrt((Math.pow((player.x - this.x),2)) + (Math.pow((player.y - this.y),2)));
 
         if (isTurning) {
-            this.thrust(0.040)
+            this.thrust(speed - .001)
         }
         else {
-            this.thrust(0.041);
+            this.thrust(speed);
         }
         if (distance < 200) {
             inPursuit = true;

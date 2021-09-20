@@ -24,8 +24,6 @@ var dash;
 var arrowKeys;
 var Akey;
 var Dkey;
-var xGridPos;
-var yGridPos;
 const cashArray = [];
 var debugText;
 var debugText2;
@@ -54,7 +52,7 @@ class MyGame extends Phaser.Scene {
 
   create() {
     // play background music
-    var music = this.sound.add('music');
+    var music = this.sound.add('music', {loop: true});
     music.play();
 
     // initialize map
@@ -71,31 +69,8 @@ class MyGame extends Phaser.Scene {
 
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     
-    // create collectibles
-    const cashCount = 9;
-    const cashColumns = 3;
-    const cashColSpacing = 1375;
-    const cashRowSpacing = 1375;
-    createGridPositions(cashCount, cashColumns, cashColSpacing, cashRowSpacing, 225, 225);
-
-    for (let i = 0; i < cashCount; i++) {
-      const cash = this.matter.add.image(xGridPos[i], yGridPos[i], 'cash').setStatic(true).setSensor(true);
-      cash.body.label = "cash";
-      //cashArray.push(cash);   // TODO: use new array for respawning?
-    }
-
-    // create sensors for AI
-    const sensorCount = 9;
-    const sensorColumns = 3;
-    const sensorColSpacing = 1375;
-    const sensorRowSpacing = 1350;
-    createGridPositions(sensorCount, sensorColumns, sensorColSpacing, sensorRowSpacing, 225, 225);
-
-    for (let i = 0; i < sensorCount; i++) {
-      const sensor = this.matter.add.image(xGridPos[i], yGridPos[i], 'sensor').setStatic(true).setSensor(true);
-      sensor.setScale(4);
-      sensor.body.label = "sensor";
-    }
+    // create collectibles and AI sensors
+    createMapObjects(this);
 
     // create player car animations
     this.anims.create({
@@ -130,13 +105,13 @@ class MyGame extends Phaser.Scene {
 
     // TODO: create multiple cops
     copBW = new Cop(this, 300, 1650, "copBW");
-    copBW.initialize();
+    copBW.initialize(0.041);
     copBW.body.label = "cop";
     
     // create user interface
     dash = this.add.sprite(400, 370, 'dash').setScrollFactor(0);
     dash.setScale(0.9)
-    scoreText = this.add.text(215,580,'', {font: '30px Courier', fill: '#ffffff'}).setScrollFactor(0);
+    scoreText = this.add.text(207,580,'', {font: '30px Courier', fill: '#ffffff'}).setScrollFactor(0);
     score = 0;
     scoreText.setText('Score: $' + score);
     var graphics = new Phaser.Geom.Rectangle(282, 525, 138, 18);
@@ -171,12 +146,10 @@ class MyGame extends Phaser.Scene {
     // collision listeners
     this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
       debugText.setText("Hit: " + bodyA.label);
-      if (bodyA.label == "Rectangle Body") {    // checks if colliding with Tilemap sprite
+      if (bodyA.label == "Rectangle Body") {    
         if (bodyA.gameObject != null) {
-          if (bodyA.gameObject.tile.properties.name == "sign") {
-            debugText.setText("Hit: " + bodyA.gameObject.tile.properties.name);
-          }
-        }
+          // checks if colliding with Tilemap sprite
+        } 
       }
       else {
         if (bodyA.label == "sensor" && bodyB.label == "cop") {    // manage cop AI
@@ -275,28 +248,59 @@ class MyGame extends Phaser.Scene {
   }
 }
 
-function createGridPositions(count, columns, columnSpacing, rowSpacing, initialX, initialY) {
-  var X = initialX;
-  var Y = initialY;
-  xGridPos = [];
-  yGridPos = [];
-  
-  for (let i = 0; i < count; i++) {
-    if (i == 0) {
-      xGridPos[i] = initialX;
-      yGridPos[i] = initialY;
-    }
-    else if (i%columns == 0) {    // iterate row
-      X = initialX;
-      Y += rowSpacing;
-      xGridPos[i] = X;
-      yGridPos[i] = Y;
-    }
-    else {    // iterate column
-      X += columnSpacing;
-      xGridPos[i] = X;
-      yGridPos[i] = Y;
-    }
+function createMapObjects(scene) {
+  const majorObj = {
+    X: [225,1600,3000,2975,1600,1600,1250,225,225,1600,1600,2975],
+    Y: [225,225,225,1630,795,1630,1630,1630,2975,2975,2300,2975]
+  }
+
+  const minorObj = {
+    X: [500,2300,2975,1600,2300,225,575,1225,2975,2300,575],
+    Y: [225,225,1050,1180,1630,2300,2975,2975,2300,2975,1630]
+  }
+
+  const cityObj = {
+    X: [2300,2300,2300,510,895,1215,575,895,1275],
+    Y: [1050,1180,795,795,795,2300,2300,1180,1180]
+  }
+
+  const plazaObj = {
+    X: [2160,2100,2160,2230,2320,2380,2320,2260,2420,2350,2420,2480],
+    Y: [2250,2300,2370,2310,2540,2480,2420,2480,2150,2220,2280,2220]
+  }
+
+  // major freeway intersections
+  for (let i = 0; i < majorObj.X.length; i++) {
+    const cash = scene.matter.add.image(majorObj.X[i], majorObj.Y[i], 'cash').setStatic(true).setSensor(true);
+    const sensor = scene.matter.add.image(majorObj.X[i], majorObj.Y[i], 'sensor').setStatic(true).setSensor(true);
+    sensor.setScale(6);
+    cash.body.label = "cash";
+    //cashArray.push(cash);   // TODO: use new array for respawning?
+  }
+
+  // minor freeway intersections
+  for (let i = 0; i < minorObj.X.length; i++) {
+    const cash = scene.matter.add.image(minorObj.X[i], minorObj.Y[i], 'cash').setStatic(true).setSensor(true);
+    const sensor = scene.matter.add.image(minorObj.X[i], minorObj.Y[i], 'sensor').setStatic(true).setSensor(true);
+    sensor.setScale(5);
+    cash.body.label = "cash";
+    //cashArray.push(cash);   
+  }
+
+  // city intersections
+  for (let i = 0; i < cityObj.X.length; i++) {
+    const cash = scene.matter.add.image(cityObj.X[i], cityObj.Y[i], 'cash').setStatic(true).setSensor(true);
+    const sensor = scene.matter.add.image(cityObj.X[i], cityObj.Y[i], 'sensor').setStatic(true).setSensor(true);
+    sensor.setScale(4);
+    cash.body.label = "cash";
+    //cashArray.push(cash);   
+  }
+
+  // plaza money
+  for (let i = 0; i < plazaObj.X.length; i++) {
+    const cash = scene.matter.add.image(plazaObj.X[i], plazaObj.Y[i], 'cash').setStatic(true).setSensor(true);
+    cash.body.label = "cash";
+    //cashArray.push(cash);   
   }
 }
 
