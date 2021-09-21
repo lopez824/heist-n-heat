@@ -16,6 +16,7 @@ import CarAImg from "./assets/Car_ani.png";
 import musicMP3 from './assets/track27.mp3';
 import engineWAV from './assets/Engine.wav';
 import crashWAV from './assets/Explosion.wav';
+import moneyMP3 from './assets/cashRegister.mp3';
 
 var player;
 var cop1;
@@ -32,6 +33,7 @@ var Akey;
 var Dkey;
 var engineSfx;
 var crashSfx;
+var moneySfx;
 var playerDeath;
 var scene;
 var backgroundLayer;
@@ -49,6 +51,7 @@ class MyGame extends Phaser.Scene {
     this.load.audio('music', musicMP3);
     this.load.audio('engine', engineWAV);
     this.load.audio('crash', crashWAV);
+    this.load.audio('money', moneyMP3);
     this.load.image("player", playerImg);
     this.load.image("copBW", copBWImg);
     this.load.image("cash", cashImg);
@@ -66,10 +69,11 @@ class MyGame extends Phaser.Scene {
   create() {
     scene = this;
     // create music
-    var music = this.sound.add('music', {loop: true});
+    var music = this.sound.add('music', {loop: true, volume: 0.75});
     music.play();
-    engineSfx = this.sound.add('engine', {loop: true, volume: 0.10});
-    crashSfx = this.sound.add('crash', {volume: 0.5});
+    engineSfx = this.sound.add('engine', {loop: true, volume: 0.05});
+    moneySfx = this.sound.add('money', {volume: 0.05});
+    crashSfx = this.sound.add('crash', {volume: 0.4});
 
     // initialize map
     var map = this.make.tilemap({key:'map'});
@@ -210,6 +214,7 @@ class MyGame extends Phaser.Scene {
         if (bodyA.label == "cash" && bodyB.label == "player") {   // collect cash
           score += 100;
           scoreText.setText('Score: $' + score);
+          moneySfx.play();
           bodyA.gameObject.destroy();
         }
         if (bodyA.label == "player" && bodyB.label == "cop") {
