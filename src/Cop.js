@@ -44,9 +44,9 @@ export default class Cop extends Phaser.Physics.Matter.Sprite {
                 callback: ()=>{
                     inPursuit = true;
                 }
-            })
+            });
         }
-        //console.log(distance);
+        
         if (this.angle >= -20 && this.angle <= 20) {
             direction = "Right";
         }
@@ -63,7 +63,6 @@ export default class Cop extends Phaser.Physics.Matter.Sprite {
             const theta = Math.atan2((player.y - this.y), (player.x - this.x));
             this.angle = theta*(180/Math.PI);
         }
-        //console.log("player: " + player.getDirection() + ", cop: " + direction);
     }
 
     setTurning(turning) {
