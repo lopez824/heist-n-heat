@@ -18,7 +18,10 @@ import engineWAV from './assets/Engine.wav';
 import crashWAV from './assets/Explosion.wav';
 
 var player;
-var copBW;
+var cop1;
+var cop2;
+var cop3;
+var cop4;
 var Dtrail;
 var speedAnim;
 var scoreText;
@@ -27,9 +30,11 @@ var dash;
 var arrowKeys;
 var Akey;
 var Dkey;
-const cashArray = [];
 var engineSfx;
 var crashSfx;
+var playerDeath;
+var scene;
+var backgroundLayer;
 var debugText;
 var debugText2;
 
@@ -59,6 +64,7 @@ class MyGame extends Phaser.Scene {
   }
 
   create() {
+    scene = this;
     // create music
     var music = this.sound.add('music', {loop: true});
     music.play();
@@ -76,7 +82,7 @@ class MyGame extends Phaser.Scene {
     // sets Collisions from tileset data
     buildings.setCollisionFromCollisionGroup();
     this.matter.world.convertTilemapLayer(buildings);
-
+    backgroundLayer = this.add.layer();
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     
     // create collectibles and AI sensors
@@ -115,9 +121,21 @@ class MyGame extends Phaser.Scene {
     engineSfx.play();
 
     // TODO: create multiple cops
-    copBW = new Cop(this, 300, 1650, "copBW");
-    copBW.initialize(0.041);
-    copBW.body.label = "cop";
+    cop1 = new Cop(this, 300, 1650, "copBW");
+    cop1.initialize(0.0405);
+    cop1.body.label = "cop";
+    cop2 = new Cop(this, 1600, 2975, "copBW");
+    cop2.initialize(0.0404);
+    cop2.body.label = "cop";
+    cop2.angle -= 90;
+    cop3 = new Cop(this, 1600, 225, "copBW");
+    cop3.initialize(0.0403);
+    cop3.body.label = "cop";
+    cop3.angle += 90;
+    cop4 = new Cop(this, 2975, 1650, "copBW");
+    cop4.initialize(0.0402);
+    cop4.body.label = "cop";
+    cop4.angle += 180;
     
     // create user interface
     dash = this.add.sprite(400, 370, 'dash').setScrollFactor(0);
@@ -146,7 +164,7 @@ class MyGame extends Phaser.Scene {
       scaleX: 0,
       x: 282,
       ease: 'Linear',
-      duration: 30000
+      duration: 50000
     });
 
     // set up inputs
@@ -154,14 +172,16 @@ class MyGame extends Phaser.Scene {
     Akey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
     Dkey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 
+    this.cameras.main.once('camerafadeoutcomplete', function (camera) {
+      music.stop();
+  });
+
     // create explosion animation
     this.anims.create({
       key: "explode",
       frames: this.anims.generateFrameNumbers('explosion', { frames: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18] }),
       frameRate: 16
     });
-    const explode = this.add.sprite(0,0);
-    //explode.visible = false;
 
     // collision listeners
     this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
@@ -176,14 +196,16 @@ class MyGame extends Phaser.Scene {
           console.log("AI sensor triggered");
           bodyB.gameObject.setTurning(true);
         }
-        if (bodyA.label == "cop" && bodyB.label == "cop") {
-          //crashSfx.play();
-          console.log("Hit: " + bodyA.label);   // TODO: destroy cop
+        if (bodyA.label == "cop" && bodyB.label == "cop") {   // destroy cops
+          crashSfx.play();
+          
+          const explode = scene.add.sprite((bodyA.gameObject.x + bodyB.gameObject.x)/2,(bodyA.gameObject.y + bodyB.gameObject.y)/2);
           explode.setScale(4);
-          explode.x = (bodyA.gameObject.x + bodyB.gameObject.x)/2
-          explode.y = (bodyA.gameObject.y + bodyB.gameObject.y)/2;
-          copBW.visible = false;
+          bodyA.gameObject.visible = false;
+          bodyB.gameObject.visible = false;
           explode.play('explode');
+          bodyA.destroy();
+          bodyB.destroy();
         }
         if (bodyA.label == "cash" && bodyB.label == "player") {   // collect cash
           score += 100;
@@ -193,12 +215,17 @@ class MyGame extends Phaser.Scene {
         if (bodyA.label == "player" && bodyB.label == "cop") {
           engineSfx.stop();
           crashSfx.play();
-          explode.setScale(2);
-          explode.x = bodyA.gameObject.x;
-          explode.y = bodyA.gameObject.y;
-          player.visible = false;
+
+          const explode = scene.add.sprite((bodyA.gameObject.x + bodyB.gameObject.x)/2,(bodyA.gameObject.y + bodyB.gameObject.y)/2);
+          explode.setScale(4);
+          bodyA.gameObject.visible = false;
+          bodyB.gameObject.visible = false;
           explode.play('explode');
-          debugText.setText("Hit: " + bodyB.label);   // TODO: destroy player
+          playerDeath = true;
+          player.body.destroy();
+
+          scene.cameras.main.fadeOut(2500);
+          debugText.setText("Hit: " + bodyB.label); 
         }
       }
     });
@@ -212,19 +239,29 @@ class MyGame extends Phaser.Scene {
 
   update() {
     this.cameras.main.centerOn(player.x,player.y);
-    player.update();
-    copBW.update(player);
+    if (!playerDeath) {
+      player.update();
+    }
+    cop1.update(player);
+    cop2.update(player);
+    cop3.update(player);
+    cop4.update(player);
+    
 
     // player turning
-    if (arrowKeys.left.isDown || Akey.isDown)
+    if (arrowKeys.left.isDown || Akey.isDown && !playerDeath)
     {
       player.angle -= 3;
       Dtrail = this.add.sprite(player.x, player.y, "dft");
+      backgroundLayer.add(Dtrail);
+      scene.cameras.main.cull(Dtrail);
     }
-    else if (arrowKeys.right.isDown || Dkey.isDown)
+    else if (arrowKeys.right.isDown || Dkey.isDown && !playerDeath)
     {
       player.angle += 3;
       Dtrail = this.add.sprite(player.x, player.y, "dft");
+      backgroundLayer.add(Dtrail);
+      scene.cameras.main.cull(Dtrail);
     }
 
     // animates speedometer

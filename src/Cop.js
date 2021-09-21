@@ -2,10 +2,12 @@ var inPursuit;
 var isTurning;
 var direction;
 var speed;
+var game;
 
 export default class Cop extends Phaser.Physics.Matter.Sprite {
     constructor(scene, x, y, texture) {
         super (scene.matter.world, x, y, texture);
+        game = scene;
         scene.add.existing(this);
     }
 
@@ -37,7 +39,12 @@ export default class Cop extends Phaser.Physics.Matter.Sprite {
             this.thrust(speed);
         }
         if (distance < 200) {
-            inPursuit = true;
+            game.time.addEvent({
+                delay: 600,
+                callback: ()=>{
+                    inPursuit = true;
+                }
+            })
         }
         //console.log(distance);
         if (this.angle >= -20 && this.angle <= 20) {
@@ -55,9 +62,6 @@ export default class Cop extends Phaser.Physics.Matter.Sprite {
         if (inPursuit) {
             const theta = Math.atan2((player.y - this.y), (player.x - this.x));
             this.angle = theta*(180/Math.PI);
-        }
-        else {
-
         }
         //console.log("player: " + player.getDirection() + ", cop: " + direction);
     }
