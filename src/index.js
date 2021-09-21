@@ -10,9 +10,12 @@ import DftImg from './assets/drift_trail.png';
 import SpeedImg from './assets/spd.png';
 import cashImg from './assets/Cash.png';
 import sensorImg from './assets/Sensor.png';
+import fireImg from './assets/explosion.png';
 import dashImg from "./assets/dash.png";
 import CarAImg from "./assets/Car_ani.png";
-import musicMP3 from './assets/track27.mp3'
+import musicMP3 from './assets/track27.mp3';
+import engineWAV from './assets/Engine.wav';
+import crashWAV from './assets/Explosion.wav';
 
 var player;
 var copBW;
@@ -25,6 +28,8 @@ var arrowKeys;
 var Akey;
 var Dkey;
 const cashArray = [];
+var engineSfx;
+var crashSfx;
 var debugText;
 var debugText2;
 
@@ -37,6 +42,8 @@ class MyGame extends Phaser.Scene {
   
   preload() {
     this.load.audio('music', musicMP3);
+    this.load.audio('engine', engineWAV);
+    this.load.audio('crash', crashWAV);
     this.load.image("player", playerImg);
     this.load.image("copBW", copBWImg);
     this.load.image("cash", cashImg);
@@ -47,13 +54,16 @@ class MyGame extends Phaser.Scene {
     this.load.image("tiles", tileImg);
     this.load.spritesheet('SpeedD', SpeedImg, { frameWidth: 128, frameHeight: 128 });
     this.load.spritesheet('CarAni', CarAImg, { frameWidth: 128, frameHeight: 128 });
+    this.load.spritesheet('explosion', fireImg, { frameWidth: 32, frameHeight: 32 });
     this.load.tilemapTiledJSON('map', mapJSON);
   }
 
   create() {
-    // play background music
+    // create music
     var music = this.sound.add('music', {loop: true});
     music.play();
+    engineSfx = this.sound.add('engine', {loop: true, volume: 0.10});
+    crashSfx = this.sound.add('crash', {volume: 0.5});
 
     // initialize map
     var map = this.make.tilemap({key:'map'});
@@ -77,7 +87,7 @@ class MyGame extends Phaser.Scene {
       key: "slow",
       frames: this.anims.generateFrameNumbers('CarAni', { frames: [0] }),
       frameRate: 20
-  });
+    });
     this.anims.create({
         key: "fast",
         frames: this.anims.generateFrameNumbers('CarAni', { frames: [1, 2, 3] }),
@@ -102,6 +112,7 @@ class MyGame extends Phaser.Scene {
     player = new Player(this, 600, 1650);
     player.initialize();
     player.body.label = "player";
+    engineSfx.play();
 
     // TODO: create multiple cops
     copBW = new Cop(this, 300, 1650, "copBW");
@@ -143,6 +154,15 @@ class MyGame extends Phaser.Scene {
     Akey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
     Dkey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 
+    // create explosion animation
+    this.anims.create({
+      key: "explode",
+      frames: this.anims.generateFrameNumbers('explosion', { frames: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18] }),
+      frameRate: 16
+    });
+    const explode = this.add.sprite(0,0);
+    //explode.visible = false;
+
     // collision listeners
     this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
       debugText.setText("Hit: " + bodyA.label);
@@ -157,7 +177,13 @@ class MyGame extends Phaser.Scene {
           bodyB.gameObject.setTurning(true);
         }
         if (bodyA.label == "cop" && bodyB.label == "cop") {
+          //crashSfx.play();
           console.log("Hit: " + bodyA.label);   // TODO: destroy cop
+          explode.setScale(4);
+          explode.x = (bodyA.gameObject.x + bodyB.gameObject.x)/2
+          explode.y = (bodyA.gameObject.y + bodyB.gameObject.y)/2;
+          copBW.visible = false;
+          explode.play('explode');
         }
         if (bodyA.label == "cash" && bodyB.label == "player") {   // collect cash
           score += 100;
@@ -165,6 +191,13 @@ class MyGame extends Phaser.Scene {
           bodyA.gameObject.destroy();
         }
         if (bodyA.label == "player" && bodyB.label == "cop") {
+          engineSfx.stop();
+          crashSfx.play();
+          explode.setScale(2);
+          explode.x = bodyA.gameObject.x;
+          explode.y = bodyA.gameObject.y;
+          player.visible = false;
+          explode.play('explode');
           debugText.setText("Hit: " + bodyB.label);   // TODO: destroy player
         }
       }

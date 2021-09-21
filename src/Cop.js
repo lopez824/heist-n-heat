@@ -52,7 +52,7 @@ export default class Cop extends Phaser.Physics.Matter.Sprite {
         else if (this.angle >= -110 && this.angle <= -30) {
             direction = "Up";
         }
-        if (inPursuit && direction) {
+        if (inPursuit) {
             const theta = Math.atan2((player.y - this.y), (player.x - this.x));
             this.angle = theta*(180/Math.PI);
         }
