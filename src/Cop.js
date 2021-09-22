@@ -42,7 +42,7 @@ export default class Cop extends Phaser.Physics.Matter.Sprite {
             game.time.addEvent({
                 delay: 600,
                 callback: ()=>{
-                    inPursuit = true;
+                  //  inPursuit = true;
                 }
             });
         }

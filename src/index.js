@@ -18,6 +18,7 @@ import musicMP3 from './assets/track27.mp3';
 import engineWAV from './assets/Engine.wav';
 import crashWAV from './assets/Explosion.wav';
 import moneyMP3 from './assets/cashRegister.mp3';
+import ftankImg from './assets/GAS_TANK.png';
 
 var player;
 var Dtrail;
@@ -69,7 +70,8 @@ class MyGame extends Phaser.Scene {
     this.load.image("tiles", tileImg);
     this.load.spritesheet('SpeedD', SpeedImg, { frameWidth: 128, frameHeight: 128 });
     this.load.spritesheet('CarAni', CarAImg, { frameWidth: 128, frameHeight: 128 });
-    this.load.spritesheet('explosion', fireImg, { frameWidth: 128, frameHeight: 128 });
+      this.load.spritesheet('explosion', fireImg, { frameWidth: 128, frameHeight: 128 });
+      this.load.spritesheet('fuelTank', ftankImg, { frameWidth: 32, frameHeight: 32 });
     this.load.tilemapTiledJSON('map', mapJSON);
   }
 
@@ -169,12 +171,12 @@ class MyGame extends Phaser.Scene {
     speedAnim.play('start');
      
     // fuel animation
-    this.tweens.add({
+     const fuelGadget = this.tweens.add({
       targets: fuel,
       scaleX: 0,
       x: 282,
       ease: 'Linear',
-      duration: 50000
+      duration: 30000
     });
 
     // set up inputs
@@ -227,7 +229,17 @@ class MyGame extends Phaser.Scene {
           scoreText.setText('Score: $' + score);
           moneySfx.play();
           bodyA.gameObject.destroy();
-        }
+          }
+
+
+          if (bodyA.label == "fuel" && bodyB.label == "player") {   // collect fuel
+              fuelGadget.restart();
+              // score -= 100;
+              console.log(bodyA);
+
+              bodyA.gameObject.destroy();
+          }
+
         if (bodyA.label == "player" && bodyB.label == "cop") {
           if (!bodyB.isSensor) {
             engineSfx.stop();
@@ -350,7 +362,14 @@ function createMapObjects(scene) {
   const majorObj = {
     X: [225,1600,3000,2975,1600,1600,1250,225,225,1600,1600,2975],
     Y: [225,225,225,1630,795,1630,1630,1630,2975,2975,2300,2975]
-  }
+    }
+
+    //fuel tank pos
+    const FtankObj = {
+        X: [225, 1600, 3000, 2975, 1600, 1600, 1250, 225, 225, 1600, 1600, 2975],
+        Y: [225, 225, 225, 1630, 795, 1630, 1630, 1630, 2975, 2975, 2300, 2975]
+    }
+
 
   const minorObj = {
     X: [500,2300,2975,1600,2300,225,575,1225,2975,2300,575],
@@ -365,7 +384,28 @@ function createMapObjects(scene) {
   const plazaObj = {
     X: [2160,2100,2160,2230,2320,2380,2320,2260,2420,2350,2420,2480],
     Y: [2250,2300,2370,2310,2540,2480,2420,2480,2150,2220,2280,2220]
-  }
+    }
+
+    //Fuel tank spawn
+    scene.anims.create({
+        key: "shit",
+        frames: scene.anims.generateFrameNumbers('fuelTank', { frames: [0, 1, 2] }),
+        frameRate: 20,
+        repeat: -1
+    });
+
+    for (let i = 0; i < majorObj.X.length; i++) {
+        //const fuel = scene.add.image(majorObj.X[i] + 50, majorObj.Y[i] + 50, 'fuelTank');
+
+
+        const FTankAnim = scene.matter.add.sprite(majorObj.X[i] + 50, majorObj.Y[i] + 50).setStatic(true).setSensor(true);
+        FTankAnim.setScale(1);
+        FTankAnim.play('shit');
+
+        FTankAnim.body.label = "fuel";
+
+    }
+
 
   // major freeway intersections
   for (let i = 0; i < majorObj.X.length; i++) {
