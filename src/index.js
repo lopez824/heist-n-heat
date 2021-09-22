@@ -19,6 +19,7 @@ import engineWAV from './assets/Engine.wav';
 import crashWAV from './assets/Explosion.wav';
 import moneyMP3 from './assets/cashRegister.mp3';
 import ftankImg from './assets/GAS_TANK.png';
+import titleImg from './assets/StartScreen.png';
 
 var player;
 var Dtrail;
@@ -33,7 +34,7 @@ var engineSfx;
 var crashSfx;
 var moneySfx;
 var playerDeath;
-var scene;
+var gameScene;
 var backgroundLayer;
 const cashArray = [];
 const copArray = [];
@@ -47,11 +48,39 @@ const copPos = {
 var debugText;
 var debugText2;
 
+// Represents Title Screen
+class StartScreen extends Phaser.Scene {
+
+  constructor() {
+    super({ key: 'startScreen' });
+  }
+
+  preload() {
+    this.load.spritesheet('Title', titleImg, { frameWidth: 200, frameHeight: 160 });
+  }
+  create() {
+    this.anims.create({
+      key: "title",
+      frames: this.anims.generateFrameNumbers('Title', {frames: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32]}),
+      frameRate: 12
+    });
+
+    const titleScreen = this.add.sprite(400,320)
+    titleScreen.setScale(3);
+    titleScreen.play('title');
+
+    // temporary button
+    const startButton = this.add.text(10, 600, 'Start Game!', { fill: '#0f0' });
+    startButton.setInteractive();
+    startButton.on('pointerdown', () => { this.scene.start('myGame') });    // listens for mouse click
+  }
+}
+
 // Represents Game Scene
 class MyGame extends Phaser.Scene {
 
   constructor() {
-    super();
+    super({ key: 'myGame' });
   }
   
   preload() {
@@ -70,14 +99,14 @@ class MyGame extends Phaser.Scene {
     this.load.image("tiles", tileImg);
     this.load.spritesheet('SpeedD', SpeedImg, { frameWidth: 128, frameHeight: 128 });
     this.load.spritesheet('CarAni', CarAImg, { frameWidth: 128, frameHeight: 128 });
-      this.load.spritesheet('explosion', fireImg, { frameWidth: 128, frameHeight: 128 });
-      this.load.spritesheet('fuelTank', ftankImg, { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('explosion', fireImg, { frameWidth: 128, frameHeight: 128 });
+    this.load.spritesheet('fuelTank', ftankImg, { frameWidth: 32, frameHeight: 32 });
     this.load.tilemapTiledJSON('map', mapJSON);
   }
 
   create() {
     // reference to scene for global use
-    scene = this;
+    gameScene = this;
     // create music
     var music = this.sound.add('music', {loop: true, volume: 0.75});
     music.play();
@@ -186,7 +215,8 @@ class MyGame extends Phaser.Scene {
 
     this.cameras.main.once('camerafadeoutcomplete', function (camera) {
       music.stop();
-  });
+      location.reload();
+    });
 
     // create explosion animation
     this.anims.create({
@@ -212,7 +242,7 @@ class MyGame extends Phaser.Scene {
           if (!bodyA.isSensor && !bodyB.isSensor) {
             crashSfx.play();
             console.log("hit");
-            const explode = scene.add.sprite((bodyA.gameObject.x + bodyB.gameObject.x)/2,(bodyA.gameObject.y + bodyB.gameObject.y)/2);
+            const explode = gameScene.add.sprite((bodyA.gameObject.x + bodyB.gameObject.x)/2,(bodyA.gameObject.y + bodyB.gameObject.y)/2);
             bodyA.gameObject.visible = false;
             bodyB.gameObject.visible = false;
             bodyA.gameObject.setStatic(true).setSensor(true);
@@ -221,7 +251,7 @@ class MyGame extends Phaser.Scene {
             score += 1;
             scoreText.setText('Score: $' + score);
 
-            scene.time.addEvent({delay: 10000,callback: ()=>{respawnCops();}});
+            gameScene.time.addEvent({delay: 10000,callback: ()=>{respawnCops();}});
           }
         }
         if (bodyA.label == "cash" && bodyB.label == "player") {   // collect cash
@@ -229,29 +259,25 @@ class MyGame extends Phaser.Scene {
           scoreText.setText('Score: $' + score);
           moneySfx.play();
           bodyA.gameObject.destroy();
-          }
+        }
 
-
-          if (bodyA.label == "fuel" && bodyB.label == "player") {   // collect fuel
-              fuelGadget.restart();
-              // score -= 100;
-              console.log(bodyA);
-
-              bodyA.gameObject.destroy();
-          }
+        if (bodyA.label == "fuel" && bodyB.label == "player") {   // collect fuel
+            fuelGadget.restart();
+            bodyA.gameObject.destroy();
+        }
 
         if (bodyA.label == "player" && bodyB.label == "cop") {
           if (!bodyB.isSensor) {
             engineSfx.stop();
             crashSfx.play();
 
-            const explode = scene.add.sprite((bodyA.gameObject.x + bodyB.gameObject.x)/2,(bodyA.gameObject.y + bodyB.gameObject.y)/2);
+            const explode = gameScene.add.sprite((bodyA.gameObject.x + bodyB.gameObject.x)/2,(bodyA.gameObject.y + bodyB.gameObject.y)/2);
             bodyA.gameObject.visible = false;
             bodyB.gameObject.visible = false;
             explode.play('explode');
             playerDeath = true;
             player.body.destroy();
-            scene.cameras.main.fadeOut(2500);
+            gameScene.cameras.main.fadeOut(2500);
           }
           debugText.setText("Hit: " + bodyB.label); 
         }
@@ -280,14 +306,14 @@ class MyGame extends Phaser.Scene {
       player.angle -= 3;
       Dtrail = this.add.sprite(player.x, player.y, "dft");
       backgroundLayer.add(Dtrail);
-      scene.cameras.main.cull(Dtrail);
+      gameScene.cameras.main.cull(Dtrail);
     }
     else if (arrowKeys.right.isDown || Dkey.isDown && !playerDeath)
     {
       player.angle += 3;
       Dtrail = this.add.sprite(player.x, player.y, "dft");
       backgroundLayer.add(Dtrail);
-      scene.cameras.main.cull(Dtrail);
+      gameScene.cameras.main.cull(Dtrail);
     }
 
     // animates speedometer
@@ -353,7 +379,7 @@ function respawnCops() {
       copArray[i].angle = copAngles[i];
       copArray[i].visible = true;
       copArray[i].setStatic(false);
-      scene.time.addEvent({delay: 1000,callback: ()=>{copArray[i].setSensor(false);}});
+      gameScene.time.addEvent({delay: 1000,callback: ()=>{copArray[i].setSensor(false);}});
     }
   }
 }
@@ -362,14 +388,13 @@ function createMapObjects(scene) {
   const majorObj = {
     X: [225,1600,3000,2975,1600,1600,1250,225,225,1600,1600,2975],
     Y: [225,225,225,1630,795,1630,1630,1630,2975,2975,2300,2975]
-    }
+  }
 
-    //fuel tank pos
-    const FtankObj = {
-        X: [225, 1600, 3000, 2975, 1600, 1600, 1250, 225, 225, 1600, 1600, 2975],
-        Y: [225, 225, 225, 1630, 795, 1630, 1630, 1630, 2975, 2975, 2300, 2975]
-    }
-
+  //fuel tank pos
+  const FtankObj = {
+      X: [225, 1600, 3000, 2975, 1600, 1600, 1250, 225, 225, 1600, 1600, 2975],
+      Y: [225, 225, 225, 1630, 795, 1630, 1630, 1630, 2975, 2975, 2300, 2975]
+  }
 
   const minorObj = {
     X: [500,2300,2975,1600,2300,225,575,1225,2975,2300,575],
@@ -384,28 +409,22 @@ function createMapObjects(scene) {
   const plazaObj = {
     X: [2160,2100,2160,2230,2320,2380,2320,2260,2420,2350,2420,2480],
     Y: [2250,2300,2370,2310,2540,2480,2420,2480,2150,2220,2280,2220]
-    }
+  }
 
-    //Fuel tank spawn
-    scene.anims.create({
-        key: "shit",
-        frames: scene.anims.generateFrameNumbers('fuelTank', { frames: [0, 1, 2] }),
-        frameRate: 20,
-        repeat: -1
-    });
+  //Fuel tank spawn
+  scene.anims.create({
+      key: "wiggle",
+      frames: scene.anims.generateFrameNumbers('fuelTank', { frames: [0, 1, 2] }),
+      frameRate: 20,
+      repeat: -1
+  });
 
-    for (let i = 0; i < majorObj.X.length; i++) {
-        //const fuel = scene.add.image(majorObj.X[i] + 50, majorObj.Y[i] + 50, 'fuelTank');
-
-
-        const FTankAnim = scene.matter.add.sprite(majorObj.X[i] + 50, majorObj.Y[i] + 50).setStatic(true).setSensor(true);
-        FTankAnim.setScale(1);
-        FTankAnim.play('shit');
-
-        FTankAnim.body.label = "fuel";
-
-    }
-
+  for (let i = 0; i < majorObj.X.length; i++) {
+      const FTankAnim = scene.matter.add.sprite(majorObj.X[i] + 50, majorObj.Y[i] + 50).setStatic(true).setSensor(true);
+      FTankAnim.setScale(1);
+      FTankAnim.play('wiggle');
+      FTankAnim.body.label = "fuel";
+  }
 
   // major freeway intersections
   for (let i = 0; i < majorObj.X.length; i++) {
@@ -459,8 +478,7 @@ const config = {
       gravity: {x:0,y:0}
     }
   },
-  scene: MyGame
+  scene: [StartScreen, MyGame]
 };
 
 const game = new Phaser.Game(config);
-
