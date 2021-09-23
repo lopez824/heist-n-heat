@@ -150,6 +150,8 @@ class MyGame extends Phaser.Scene {
     this.matter.world.convertTilemapLayer(buildings);
     backgroundLayer = this.add.layer();
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+    this.cameras.main.roundPixels = true;
+
     
     // create collectibles and AI sensors
     createMapObjects(this);
