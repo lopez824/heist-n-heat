@@ -20,6 +20,8 @@ import crashWAV from './assets/Explosion.wav';
 import moneyMP3 from './assets/cashRegister.mp3';
 import ftankImg from './assets/GAS_TANK.png';
 import titleImg from './assets/StartScreen.png';
+import keyImg from './assets/keyignition.png';
+
 
 var player;
 var Dtrail;
@@ -33,6 +35,7 @@ var Dkey;
 var engineSfx;
 var crashSfx;
 var moneySfx;
+
 var playerDeath;
 var gameScene;
 var backgroundLayer;
@@ -56,7 +59,9 @@ class StartScreen extends Phaser.Scene {
   }
 
   preload() {
-    this.load.spritesheet('Title', titleImg, { frameWidth: 200, frameHeight: 160 });
+      this.load.spritesheet('Title', titleImg, { frameWidth: 200, frameHeight: 160 });
+      this.load.image("Key", keyImg);
+
   }
   create() {
     this.anims.create({
@@ -70,9 +75,11 @@ class StartScreen extends Phaser.Scene {
     titleScreen.play('title');
 
     // temporary button
-    const startButton = this.add.text(10, 600, 'Start Game!', { fill: '#0f0' });
-    startButton.setInteractive();
-    startButton.on('pointerdown', () => { this.scene.start('myGame') });    // listens for mouse click
+
+      const startKey = this.add.image(180, 560, 'Key');
+    const startButton = this.add.text(130, 600, 'Ignition!', { fill: '#0f0' });
+    startKey.setInteractive();
+      startKey.on('pointerdown', () => { this.scene.start('myGame') });    // listens for mouse click
   }
 }
 
