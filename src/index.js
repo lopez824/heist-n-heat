@@ -14,14 +14,16 @@ import sensorImg from './assets/Sensor.png';
 import fireImg from './assets/explosion.png';
 import dashImg from "./assets/dash.png";
 import CarAImg from "./assets/Car_ani.png";
-import musicMP3 from './assets/track27.mp3';
+import musicMP3 from './assets/Retro_Synthwave.wav';
 import engineWAV from './assets/Engine.wav';
 import crashWAV from './assets/Explosion.wav';
 import moneyMP3 from './assets/cashRegister.mp3';
+import fuelWAV from './assets/slurp.wav';
+import sirenMP3 from './assets/sirens.mp3';
 import ftankImg from './assets/GAS_TANK.png';
 import titleImg from './assets/StartScreen.png';
 import keyImg from './assets/keyignition.png';
-
+import bustedImg from './assets/Busted.png';
 
 var player;
 var Dtrail;
@@ -35,7 +37,7 @@ var Dkey;
 var engineSfx;
 var crashSfx;
 var moneySfx;
-
+var fuelSfx;
 var playerDeath;
 var gameScene;
 var backgroundLayer;
@@ -47,9 +49,9 @@ const copAngles = [0,-90,90]
 const copPos = {
   X: [300,1600,1600],
   Y: [1650,2975,225]
-}
-var debugText;
-var debugText2;
+};
+//var debugText;
+//var debugText2;
 
 // Represents Title Screen
 class StartScreen extends Phaser.Scene {
@@ -76,10 +78,10 @@ class StartScreen extends Phaser.Scene {
 
     // temporary button
 
-      const startKey = this.add.image(180, 560, 'Key');
+    const startKey = this.add.image(180, 560, 'Key');
     const startButton = this.add.text(130, 600, 'Ignition!', { fill: '#0f0' });
     startKey.setInteractive();
-      startKey.on('pointerdown', () => { this.scene.start('myGame') });    // listens for mouse click
+    startKey.on('pointerdown', () => { this.scene.start('myGame') });    // listens for mouse click
   }
 }
 
@@ -95,6 +97,8 @@ class MyGame extends Phaser.Scene {
     this.load.audio('engine', engineWAV);
     this.load.audio('crash', crashWAV);
     this.load.audio('money', moneyMP3);
+    this.load.audio('fuelSfx', fuelWAV);
+    this.load.audio('siren', sirenMP3);
     this.load.image("player", playerImg);
     this.load.image("copBW", copBWImg);
     this.load.image("copBlue", copBlueImg);
@@ -103,6 +107,7 @@ class MyGame extends Phaser.Scene {
     this.load.image("dft", DftImg);
     this.load.image('speed', SpeedImg);
     this.load.image('sensor', sensorImg);
+    this.load.image('busted', bustedImg);
     this.load.image("tiles", tileImg);
     this.load.spritesheet('SpeedD', SpeedImg, { frameWidth: 128, frameHeight: 128 });
     this.load.spritesheet('CarAni', CarAImg, { frameWidth: 128, frameHeight: 128 });
@@ -115,11 +120,13 @@ class MyGame extends Phaser.Scene {
     // reference to scene for global use
     gameScene = this;
     // create music
-    var music = this.sound.add('music', {loop: true, volume: 0.75});
+    var music = this.sound.add('music', {loop: true});
     music.play();
-    engineSfx = this.sound.add('engine', {loop: true, volume: 0.05});
-    moneySfx = this.sound.add('money', {volume: 0.05});
-    crashSfx = this.sound.add('crash', {volume: 0.4});
+    engineSfx = this.sound.add('engine', {loop: true});
+    moneySfx = this.sound.add('money');
+    crashSfx = this.sound.add('crash');
+    fuelSfx = this.sound.add('fuelSfx');
+    var sirens = this.sound.add('siren', {loop: true});
 
     // initialize map
     var map = this.make.tilemap({key:'map'});
@@ -184,6 +191,8 @@ class MyGame extends Phaser.Scene {
       cop.angle = copAngles[i];
       copArray.push(cop);
     }
+
+    sirens.play();
     
     // create user interface
     dash = this.add.sprite(400, 370, 'dash').setScrollFactor(0);
@@ -222,7 +231,8 @@ class MyGame extends Phaser.Scene {
 
     this.cameras.main.once('camerafadeoutcomplete', function (camera) {
       music.stop();
-      location.reload();
+      gameScene.add.image(400,320,'busted')
+      //location.reload();
     });
 
     // create explosion animation
@@ -234,7 +244,7 @@ class MyGame extends Phaser.Scene {
 
     // collision listeners
     this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
-      debugText.setText("Hit: " + bodyA.label);
+      //debugText.setText("Hit: " + bodyA.label);
       if (bodyA.label == "Rectangle Body") {    
         if (bodyA.gameObject != null) {
           // checks if colliding with Tilemap sprite
@@ -269,6 +279,7 @@ class MyGame extends Phaser.Scene {
         }
 
         if (bodyA.label == "fuel" && bodyB.label == "player") {   // collect fuel
+          fuelSfx.play();
             fuelGadget.restart();
             bodyA.gameObject.destroy();
         }
@@ -286,13 +297,13 @@ class MyGame extends Phaser.Scene {
             player.body.destroy();
             gameScene.cameras.main.fadeOut(2500);
           }
-          debugText.setText("Hit: " + bodyB.label); 
+          //debugText.setText("Hit: " + bodyB.label); 
         }
       }
     });
 
-    debugText = this.add.text(10,10,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
-    debugText2 = this.add.text(10,30,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
+    //debugText = this.add.text(10,10,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
+    //debugText2 = this.add.text(10,30,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
 
     // world bounds
     this.matter.world.setBounds(124, 124, map.widthInPixels - 248, map.heightInPixels - 248);   
@@ -369,11 +380,11 @@ class MyGame extends Phaser.Scene {
       player.play('right',true);
     }
 
-    var pointer = this.input.activePointer;
+    /* var pointer = this.input.activePointer;
     debugText2.setText([
       'x: ' + pointer.worldX,
       'y: ' + pointer.worldY
-  ]);
+    ]); */
   }
 }
 
