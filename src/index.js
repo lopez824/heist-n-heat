@@ -125,10 +125,10 @@ class MyGame extends Phaser.Scene {
     // create music
     var music = this.sound.add('music', {loop: true});
     music.play();
-    engineSfx = this.sound.add('engine', {loop: true});
-    moneySfx = this.sound.add('money');
-    crashSfx = this.sound.add('crash');
-    fuelSfx = this.sound.add('fuelSfx');
+    engineSfx = this.sound.add('engine', {loop: true, volume: 0.25});
+    moneySfx = this.sound.add('money',{volume: 0.5});
+    crashSfx = this.sound.add('crash',{volume: 0.5});
+    fuelSfx = this.sound.add('fuelSfx',{volume: 0.75});
 
     // initialize map
     var map = this.make.tilemap({key:'map'});
@@ -273,7 +273,7 @@ class MyGame extends Phaser.Scene {
             bodyA.gameObject.setStatic(true).setSensor(true);
             bodyB.gameObject.setStatic(true).setSensor(true);
             explode.play('explode');
-            score += 1;
+            score += 100;
             scoreText.setText('Score: $' + score);
 
             gameScene.time.addEvent({delay: 10000,callback: ()=>{respawnCops();}});
@@ -314,7 +314,7 @@ class MyGame extends Phaser.Scene {
     //debugText2 = this.add.text(10,30,'', {font: '16px Courier', fill: '#ffffff'}).setScrollFactor(0);
 
     // world bounds
-    this.matter.world.setBounds(124, 124, map.widthInPixels - 248, map.heightInPixels - 248);   
+    //this.matter.world.setBounds(124, 124, map.widthInPixels - 248, map.heightInPixels - 248);   
   }
 
   update() {
@@ -412,8 +412,8 @@ function respawnCops() {
 
 function createMapObjects(scene) {
   const majorObj = {
-    X: [225,1600,3000,2975,1600,1600,1250,225,225,1600,1600,2975],
-    Y: [225,225,225,1630,795,1630,1630,1630,2975,2975,2300,2975]
+    X: [120,120,120,1600,1600,1600,3075,3075,3075],
+    Y: [130,1630,3000,130,1630,3000,130,1630,3000]
   }
 
   //fuel tank pos
@@ -423,13 +423,13 @@ function createMapObjects(scene) {
   }
 
   const minorObj = {
-    X: [500,2300,2975,1600,2300,225,575,1225,2975,2300,575],
-    Y: [225,225,1050,1180,1630,2300,2975,2975,2300,2975,1630]
+    X: [545,2070,130,130,1600,3075,485,1310,2335],
+    Y: [130,130,2590,2075,890,2225,3000,3000,3000]
   }
 
   const cityObj = {
-    X: [2300,2300,2300,510,895,1215,575,895,1275],
-    Y: [1050,1180,795,795,795,2300,2300,1180,1180]
+    X: [545,870,870,1060,1310,480,2590,2330,2590],
+    Y: [880,2080,2600,900,1630,2080,890,1630,890]
   }
 
   const plazaObj = {
@@ -446,7 +446,7 @@ function createMapObjects(scene) {
   });
 
   for (let i = 0; i < majorObj.X.length; i++) {
-      const FTankAnim = scene.matter.add.sprite(majorObj.X[i] + 50, majorObj.Y[i] + 50).setStatic(true).setSensor(true);
+      const FTankAnim = scene.matter.add.sprite(majorObj.X[i] + 50, majorObj.Y[i] + 20).setStatic(true).setSensor(true);
       FTankAnim.setScale(1);
       FTankAnim.play('wiggle');
       FTankAnim.body.label = "fuel";
