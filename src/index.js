@@ -138,13 +138,15 @@ class MyGame extends Phaser.Scene {
     map.createLayer('background', tileset,0,0); 
     map.createLayer('Roads', tileset,0,0); 
     map.createLayer('Buildings Bottom', tileset,0,0);
-    const buildings = map.createLayer('Buildings', [tileset,tileset2],0,0); 
-    map.createLayer('props', tileset,0,0); 
+    const buildings = map.createLayer('Buildings', tileset,0,0); 
+    const prop = map.createLayer('props', [tileset,tileset2],0,0); 
     
     //map.createLayer('Props', tileset,0,0); 
 
     // sets Collisions from tileset data
     buildings.setCollisionFromCollisionGroup();
+    prop.setCollisionFromCollisionGroup();
+    this.matter.world.convertTilemapLayer(prop);
     this.matter.world.convertTilemapLayer(buildings);
     backgroundLayer = this.add.layer();
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
