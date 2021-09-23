@@ -2,8 +2,11 @@ import "./index.css";
 import Phaser from "phaser";
 import Player from "./Player.js"
 import Cop from './Cop.js';
-import mapJSON from "./assets/map.json";
-import tileImg from "./assets/Tilesheet.png";
+//import mapJSON from "./assets/map.json";
+import mapJSON from "./assets/finalmapredux.json";
+//import tileImg from "./assets/Tilesheet.png";
+import tileImg from "./assets/Tilesheefinal.png";
+import tile2Img from "./assets/TrafficLightStand.png";
 import playerImg from "./assets/Car_Placeholder.png";
 import copBWImg from "./assets/copBW.png";
 import copBlueImg from './assets/copBlue.png';
@@ -19,7 +22,6 @@ import engineWAV from './assets/Engine.wav';
 import crashWAV from './assets/Explosion.wav';
 import moneyMP3 from './assets/cashRegister.mp3';
 import fuelWAV from './assets/slurp.wav';
-import sirenMP3 from './assets/sirens.mp3';
 import ftankImg from './assets/GAS_TANK.png';
 import titleImg from './assets/StartScreen.png';
 import keyImg from './assets/keyignition.png';
@@ -99,7 +101,6 @@ class MyGame extends Phaser.Scene {
     this.load.audio('crash', crashWAV);
     this.load.audio('money', moneyMP3);
     this.load.audio('fuelSfx', fuelWAV);
-    this.load.audio('siren', sirenMP3);
     this.load.image("player", playerImg);
     this.load.image("copBW", copBWImg);
     this.load.image("copBlue", copBlueImg);
@@ -110,6 +111,7 @@ class MyGame extends Phaser.Scene {
     this.load.image('sensor', sensorImg);
     this.load.image('busted', bustedImg);
     this.load.image("tiles", tileImg);
+    this.load.image('light', tile2Img);
     this.load.spritesheet('SpeedD', SpeedImg, { frameWidth: 128, frameHeight: 128 });
     this.load.spritesheet('CarAni', CarAImg, { frameWidth: 128, frameHeight: 128 });
     this.load.spritesheet('explosion', fireImg, { frameWidth: 128, frameHeight: 128 });
@@ -127,15 +129,19 @@ class MyGame extends Phaser.Scene {
     moneySfx = this.sound.add('money');
     crashSfx = this.sound.add('crash');
     fuelSfx = this.sound.add('fuelSfx');
-    var sirens = this.sound.add('siren', {loop: true});
 
     // initialize map
     var map = this.make.tilemap({key:'map'});
-    const tileset = map.addTilesetImage('Tilesheet','tiles');
-    map.createLayer('Background', tileset,0,0); 
+    const tileset = map.addTilesetImage('Tilesheefinal','tiles');
+    const tileset2 = map.addTilesetImage('TrafficLightStand','light');
+    //map.createLayer('Background', tileset,0,0); 
+    map.createLayer('background', tileset,0,0); 
     map.createLayer('Roads', tileset,0,0); 
-    const buildings = map.createLayer('Buildings', tileset,0,0); 
-    map.createLayer('Props', tileset,0,0); 
+    map.createLayer('Buildings Bottom', tileset,0,0);
+    const buildings = map.createLayer('Buildings', [tileset,tileset2],0,0); 
+    map.createLayer('props', tileset,0,0); 
+    
+    //map.createLayer('Props', tileset,0,0); 
 
     // sets Collisions from tileset data
     buildings.setCollisionFromCollisionGroup();
@@ -192,8 +198,6 @@ class MyGame extends Phaser.Scene {
       cop.angle = copAngles[i];
       copArray.push(cop);
     }
-
-    sirens.play();
     
     // create user interface
     dash = this.add.sprite(400, 370, 'dash').setScrollFactor(0);
@@ -232,8 +236,9 @@ class MyGame extends Phaser.Scene {
 
     this.cameras.main.once('camerafadeoutcomplete', function (camera) {
       music.stop();
-      gameScene.add.image(400,320,'busted')
-      //location.reload();
+      gameScene.add.image(400,320,'busted');
+      gameScene.cameras.main.fadeOut(2500);
+      location.reload();
     });
 
     // create explosion animation
